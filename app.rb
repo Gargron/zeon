@@ -2,10 +2,11 @@ require 'rubygems'
 require 'sinatra'
 require 'haml'
 require 'datamapper'
-require 'coffee-script'
+require 'openssl'
 require 'redis'
 require 'proudhon'
 
+require 'coffee-script'
 require 'sinatra/jsonp'
 require 'sinatra/session'
 require 'sinatra/flash'
@@ -22,6 +23,7 @@ class User
   property :password, BCryptHash, :required => true, :length => 6..200
   property :email, String, :required => true, :unique => true, :format => :email_address
   property :status, Enum[ :active, :remote, :administrator, :inactive, :deleted ], :required => true, :default => :active
+  property :blob, Json
   property :private_key, Text
   property :public_key, Text
   property :updated_at, DateTime
@@ -40,18 +42,29 @@ class User
   def avatar(size = 30)
     "http://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(email)}?s=#{size}"
   end
+
+  before :create do
+    key = OpenSSL::PKey::RSA::generate(512)
+    self.private_key = key.to_s
+    self.public_key = key.public_key.to_s
+    self.blob = {} unless self.blob
+  end
 end
 
 class Friendship
   include DataMapper::Resource
 
   property :id, Serial
-  property :accepted, Boolean, :default => false, :required => true
-  property :updated_at, DateTime, :required => true
-  property :created_at, DateTime, :required => true
+  property :accepted, Boolean, :default => true, :required => true
+  property :updated_at, DateTime
+  property :created_at, DateTime
 
   belongs_to :user
   belongs_to :friend, :model => 'User'
+
+  before :create do
+    self.accepted = false if friend.blob[:private] == true
+  end
 end
 
 class Tag
@@ -59,11 +72,13 @@ class Tag
 
   property :id, Serial
   property :name, String, :required => true, :unique => true, :index => true, :length => 1..50
-  property :count, Integer, :required => true, :default => 1
-  property :updated_at, DateTime, :required => true
-  property :created_at, DateTime, :required => true
+  property :count, Integer, :required => true, :default => 0
+  property :type, Enum[ :normal, :toplevel, :blacklist ], :required => true, :default => :normal
+  property :updated_at, DateTime
+  property :created_at, DateTime
 
   has n, :activities
+  has n, :users, :through => Resource
 end
 
 class Group
@@ -72,14 +87,14 @@ class Group
   property :id, Serial
   property :name, String, :required => true, :unique => true, :index => true, :length => 1..50
   property :description, Text
-  property :count, Integer, :required => true, :default => 1
-  property :updated_at, DateTime, :required => true
-  property :created_at, DateTime, :required => true
+  property :count, Integer, :required => true, :default => 0
+  property :updated_at, DateTime
+  property :created_at, DateTime
 
   belongs_to :owner, :model => 'User'
 
   has n, :users, :through => Resource
-  has n, :activities
+  has n, :groups, :through => Resource
 end
 
 class Activity
@@ -89,21 +104,35 @@ class Activity
   property :type, Enum[ :post, :reply, :comment, :link, :image,
     :video, :question, :event, :like, :bookmark, :vote, :tag,
     :attendance, :invitation, :poke, :recommendation, :message,
-    :announcement ], :required => true
+    :announcement, :follow, :unfollow ], :required => true
   property :title, String, :required => true
   property :content, Text
   property :meta, Json
-  property :updated_at, DateTime, :required => true
-  property :created_at, DateTime, :required => true
+  property :updated_at, DateTime
+  property :created_at, DateTime
 
   belongs_to :user
-  belongs_to :receiver, :model => 'User'
   belongs_to :activity
-  belongs_to :group
+  belongs_to :group, :required => false
 
   has n, :activities
   has n, :notifications
   has n, :tags, :through => Resource
+
+  CONTENT = [ :post, :reply, :comment, :link, :image, :video, :question, :event ]
+  PRIVATE = [ :bookmark, :vote, :invitation, :poke, :reccomendation, :message ]
+  MENTION = /@([a-z1-9]+)/i
+  HASHTAG = /#([a-z1-9]+)/i
+  GROUPTAG = /~([a-z1-9]+)/i
+
+  before :save do
+    if CONTENT.include? type
+      # Parse mentions, tags and group-tags
+      mentions = User.all(:name => content.scan(MENTION))
+      tags = content.scan(HASHTAG).flatten.map {|t| Tag.first(:name => t) || Tag.create(:name => t)}
+      group = Group.first(:name => content.scan(GROUPTAG))
+    end
+  end
 end
 
 class Notification
@@ -111,8 +140,9 @@ class Notification
 
   property :id, Serial
   property :kind, Enum[ :announcement, :message, :mention, :activity,
-    :mine, :bookmark, :replied, :subscription, :group ]
-  property :created_at, DateTime, :required => true
+    :mine, :bookmark, :replied, :tag, :group ]
+  property :read, Boolean, :required => true, :default => false
+  property :created_at, DateTime
 
   belongs_to :activity
   belongs_to :user
@@ -125,9 +155,14 @@ before do
   @cur_user = User.first(:id => session[:id]) if session?
 end
 
+
 ## Controllers
 get '/' do
-  haml :index
+  if session?
+    haml :dashboard
+  else
+    haml :index
+  end
 end
 
 get '/style.css' do
@@ -142,14 +177,54 @@ get '/script.js' do
   coffee :script
 end
 
-## Content pages
-get '/dashboard' do
-  session!
 
-  haml :dashboard
+## Content filter
+post '/dashboard.json' do
+  # Filter
 end
 
-# Login
+
+## Content Interaction
+post '/activity' do
+  # Create Activity
+end
+
+post '/activitiy/:id/edit' do
+  # Edit Activity
+end
+
+post '/activity/:id/delete' do
+  # Delete Activity
+end
+
+post '/activity/:id/:action' do |id,action|
+  # Reply
+  # Like
+  # Tag
+  # Untag
+  # Like
+  # Unlike
+  # Attend
+  # Lock
+  # Unlock
+  # Bookmark
+  # Unbookmark
+  # Reccomend
+  # Invite
+end
+
+
+## Profiles
+get '/:user/?' do |user|
+  # hCard Profile
+end
+
+get '/:user/feed/?' do |user|
+  # Atom feed
+end 
+
+
+## Access Control
 get '/login' do
   redirect '/' if session?
 
@@ -181,7 +256,6 @@ post '/login' do
   end
 end
 
-# Sign Up
 get '/signup' do
   redirect '/' if session?
   haml :'user/signup'
@@ -213,7 +287,6 @@ post '/signup' do
   haml :'user/signup'
 end
 
-# Reset password
 get '/reset' do
   redirect '/' if session?
 
@@ -242,7 +315,6 @@ post '/reset' do
   redirect '/', :success => "If you're registered with us, your new password was just sent to your e-mail."
 end
 
-# Edit Profile
 get '/profile' do
   session!
 
@@ -279,7 +351,6 @@ post '/profile' do
   end
 end
 
-# Delete Profile
 get '/profile/delete' do
   session!
 
@@ -301,7 +372,6 @@ post '/profile/delete' do
   haml :'user/profile_delete'
 end
 
-# Logout
 get '/logout' do
   session_end!
 
