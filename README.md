@@ -1,5 +1,7 @@
 # Zeon
 
+**Attention: this software is still under development. This is just a cental repository for contribution.**
+
 Zeon is a minimalist open-source federated social network. It is written in Ruby using the Sinatra micro-framework, DataMapper and Redis. It aims to be lightweight, easy to install, easy to scale and easy to contribute.
 
 Our strategy is to use caching and background workers to allow for non-blocking requests, serving a larger number of simultaneous users during peaks with a smaller setup.
@@ -10,7 +12,7 @@ The 'federated' part means that users on a certain Zeon instance can communicate
 
 Those gems will get the ball rolling:
 
-    sudo gem install sinatra haml datamapper redis proudhon bcrypt
+    sudo gem install sinatra haml datamapper redis proudhon bcrypt coffee-script sinatra-jsonp sinatra-session sinatra-flash sinatra-redirect-with-flash
 
 Redis is our cache server. For Push support we use Comet. We recomend Thin, Unicorn, Rainbows!, or Phusion Passengers as your Ruby app server.
 
