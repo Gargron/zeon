@@ -1,0 +1,4 @@
+%form{ :action => '/reset', :method => 'post' }
+  %label{ :for => 'email' } E-mail:
+  %input{ :name => 'email', :type => 'text', :placeholder => 'E-mail', :value => params[:email] }
+  %button{ :type => 'signup' } Reset

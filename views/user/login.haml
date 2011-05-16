@@ -1,0 +1,6 @@
+%form#login{ :method => 'post', :action => '/login' }
+  %label{ :for => 'login' } Login:
+  %input{ :name => 'login', :type => 'text', :placeholder => 'Login', :value => params[:login] }
+  %label{ :for => 'password' } Password:
+  %input{ :name => 'password', :type => 'password', :placeholder => 'Password' }
+  %button{ :type => 'submit' } Login

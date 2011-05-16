@@ -1,0 +1,8 @@
+%form{ :action => '/signup', :method => 'post' }
+  %label{ :for => 'login' } Login:
+  %input{ :name => 'login', :type => 'text', :placeholder => 'Login', :value => params[:login] }
+  %label{ :for => 'password' } Password:
+  %input{ :name => 'password', :type => 'password', :placeholder => 'Password' }
+  %label{ :for => 'email' } E-mail:
+  %input{ :name => 'email', :type => 'text', :placeholder => 'E-mail', :value => params[:email] }
+  %button{ :type => 'submit' } Sign Up
