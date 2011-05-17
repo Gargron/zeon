@@ -30,14 +30,14 @@ class User
   property :created_at, DateTime
 
   has n, :friendships
-  has n, :follows, :model => 'Friendship', :child_key => :friend_id
+  has n, :friendships2, :model => 'Friendship', :child_key => :friend_id
   has n, :notifications
   has n, :activities
 
   has n, :follows, self, :through => :friendships, :via => :friend
-  has n, :followers, self, :through => :follows, :via => :user
-  has n, :tags, :through => Resource
-  has n, :groups, :through => Resource
+  has n, :followers, self, :through => :friendships2, :via => :user
+  has n, :tags, :through => Resource, :constraint => :destroy
+  has n, :groups, :through => Resource, :constraint => :destroy
 
   def avatar(size = 30)
     "http://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(email)}?s=#{size}"
@@ -77,8 +77,8 @@ class Tag
   property :updated_at, DateTime
   property :created_at, DateTime
 
-  has n, :activities
-  has n, :users, :through => Resource
+  has n, :activities, :through => Resource, :constraint => :destroy
+  has n, :users, :through => Resource, :constraint => :destroy
 end
 
 class Group
@@ -93,8 +93,8 @@ class Group
 
   belongs_to :owner, :model => 'User'
 
-  has n, :users, :through => Resource
-  has n, :groups, :through => Resource
+  has n, :activities
+  has n, :users, :through => Resource, :constraint => :destroy
 end
 
 class Activity
@@ -104,7 +104,7 @@ class Activity
   property :type, Enum[ :post, :reply, :comment, :link, :image,
     :video, :question, :event, :like, :bookmark, :vote, :tag,
     :attendance, :invitation, :poke, :recommendation, :message,
-    :announcement, :follow, :unfollow ], :required => true
+    :announcement ], :required => true, :index => true
   property :title, String, :required => true
   property :content, Text
   property :meta, Json
@@ -112,25 +112,42 @@ class Activity
   property :created_at, DateTime
 
   belongs_to :user
-  belongs_to :activity
+  belongs_to :activity, :required => false
   belongs_to :group, :required => false
 
   has n, :activities
   has n, :notifications
-  has n, :tags, :through => Resource
+  has n, :tags, :through => Resource, :constraint => :destroy
 
   CONTENT = [ :post, :reply, :comment, :link, :image, :video, :question, :event ]
+  REPLY = [ :reply, :comment, :like, :vote, :tag, :attendance ]
   PRIVATE = [ :bookmark, :vote, :invitation, :poke, :reccomendation, :message ]
   MENTION = /@([a-z1-9]+)/i
   HASHTAG = /#([a-z1-9]+)/i
   GROUPTAG = /~([a-z1-9]+)/i
 
-  before :save do
-    if CONTENT.include? type
-      # Parse mentions, tags and group-tags
+  after :create do
+    unless PRIVATE.include? type
       mentions = User.all(:name => content.scan(MENTION))
-      tags = content.scan(HASHTAG).flatten.map {|t| Tag.first(:name => t) || Tag.create(:name => t)}
-      group = Group.first(:name => content.scan(GROUPTAG))
+      self.tags = content.scan(HASHTAG).flatten.map {|t| Tag.first(:name => t) || Tag.create(:name => t) }
+      self.group = Group.first(:name => content.scan(GROUPTAG))
+      self.save
+
+      root = self.activity || self
+      notify(:mention, mentions)
+      notify(:group, root.group.users) if root.group
+      notify(:tag, root.tags.users)
+      notify(:activity, self.user.friendships2.all(:accepted => true).users)
+      notify(:mine, [ root.user ])
+      notify(:bookmark, root.activities(:type => :bookmark).users)
+      notify(:replied, root.activities(:type => :reply).users)
+      notify(:liked, root.activities(:type => :like).users)
+    end
+  end
+
+  def notify(kind, users)
+    users.each do |target|
+      self.notifications << Notification.create(:kind => kind, :user => target, :sender => self.user, :activity => self, :parent => self.activity || self)
     end
   end
 end
@@ -140,21 +157,23 @@ class Notification
 
   property :id, Serial
   property :kind, Enum[ :announcement, :message, :mention, :activity,
-    :mine, :bookmark, :replied, :tag, :group ]
+    :mine, :bookmark, :replied, :liked, :tag, :group ]
   property :read, Boolean, :required => true, :default => false
   property :created_at, DateTime
 
   belongs_to :activity
+  belongs_to :parent, :model => 'Activity'
   belongs_to :user
   belongs_to :sender, :model => 'User'
 end
 
 DataMapper.auto_upgrade!
 
+
+
 before do
   @cur_user = User.first(:id => session[:id]) if session?
 end
-
 
 ## Controllers
 get '/' do
