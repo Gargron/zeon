@@ -1,0 +1,87 @@
+form
+  background: #111 url('/images/micro_carbon.gif')
+  border: 1px solid #000
+  border-top-color: #444
+  @include border-radius( 10px )
+  @include box-shadow( 0 -1px 0 #000, 0 5px 20px rgba(0, 0, 0, 0.2) )
+  padding: 10px
+  fieldset
+    legend
+      font-size: 24px
+      color: #fff
+      border-color: #000
+      text-align: center
+      display: block
+      font-weight: bold
+      width: 100%
+      @include text-shadow( rgb(0, 0, 0) 1px 2px 1px )
+      @include trailing-border(1px, 0.5)
+      @include border-top-radius( 5px )
+  li:not(:last-child)
+    @include trailer()
+    &:first-child
+      @include padding-leader()
+
+.box
+  background: #101010
+  padding: 10px
+  border: 1px solid #000
+  @include box-shadow( inset 0 1px 1px 0 rgba(70, 70, 70, 0.5), inset 0 20px 50px rgba(50, 50, 50, 0.5) )
+  @include margin-leader()
+  @include border-radius( 5px )
+
+label.block
+  display: block
+  text-transform: uppercase
+  font-size: 12px
+  font-weight: bold
+  @include trailer(0.5)
+
+input[type=text], input[type=email], input[type=url], input[type=password]
+  background: #ccc
+  @include box-shadow( inset 0 5px 10px rgba(0, 0, 0, 0.2) )
+  border: 4px solid rgba(0, 0, 0, 0.5)
+  padding: 5px
+  @include box-sizing( border-box )
+  font-size: 14px
+  @include border-radius( 5px )
+  &:focus
+    outline: none
+    background: #fff
+  &.extra_large
+    display: block
+    width: 100%
+    font-size: 18px
+
+//
+// blue pill (inspired by iTunes)
+// As of 19 Sep 2010 there is a bug in Chrome/Win affecting this button:
+// http://code.google.com/p/chromium/issues/detail?id=29427
+//
+
+button
+  background: #112011
+  @linear-gradient( color-stops(#112011, #0b150b) )
+  border-top: 1px solid #050a05
+  border-right: 1px solid #0b150b
+  border-bottom: 1px solid #050a05
+  border-left: 1px solid #0b150b
+  @include border-radius( 3px )
+  @include box-shadow( inset 0 1px 0 0 #1d361d )
+  color: #fff
+  font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif
+  font-size: 11px
+  font-weight: bold
+  line-height: 1
+  padding: 8px 0 8px 0
+  text-align: center
+  @include text-shadow( #0b150b 0 -1px 1px )
+  text-transform: uppercase
+  width: 150px
+  &:hover
+    background: #121
+    @linear-gradient( color-stops(#121, #0b170b) )
+    cursor: pointer
+    &:active
+      border: 1px solid #060b06
+      @include box-shadow( inset 0 0 8px 2px #060b06, 0 1px 0 0 #1d361d )

@@ -1,0 +1,92 @@
+ul.activity
+  list-style: none
+  li.item
+    background: rgba(30, 30, 30, 0.9)
+    border: 1px solid #131313
+    @include border-radius( 10px )
+    @include trailer()
+    @include box-shadow( 0 1px 1px 2px rgba(0, 0, 0, 0.1) )
+    div.item_meta
+      background: rgba(0, 0, 0, 0.4)
+      border-top: 1px solid #333
+      border-bottom: 1px solid #101010
+      padding: 5px 10px
+      @include border-top-radius( 10px )
+      position: relative
+      font-size: 13px
+      a
+        text-decoration: none
+        &:hover
+          text-decoration: underline
+      span.name, a.object
+        font-weight: bold
+      img.avatar
+        float: right
+        border: 4px solid #111
+        position: absolute
+        right: 10px
+        top: 5px
+        +box-shadow(0 0 3px rgba(0, 0, 0, 0.2))
+      span.time
+        display: inline-block
+        float: right
+        margin-right: 66px
+    div.item_content
+      padding: 10px
+      color: #fff
+      +clearfix
+      h2
+        // font-weight: bold
+        font-size: 18px
+        font-family: 'Arvo', "Helvetica Neue", Helvetica, Arial, Verdana, sans-serif
+        @include leader(0.2, 18px)
+        @include trailer(0.5, 18px)
+        a
+          text-decoration: none
+          color: #88c6e0
+      blockquote.item_reply
+        @include leader(0.2, 18px)
+        padding: 5px
+        font-size: 13px
+        background: rgba(50, 50, 50, 0.8)
+        @include border-radius( 5px )
+        color: #ddd
+      a.item_image
+        display: block
+        float: left
+        +leader(0.2, 18px)
+        margin-right: 20px
+        width: 220px
+      div.item_image_info
+        float: left
+        width: 345px
+        font-size: 13px
+        clear: right
+        dl
+          +clearfix
+          dt
+            float: left
+            width: 40%
+            color: #aaa
+          dd
+            float: left
+            width: 60%
+            font-weight: bold
+      blockquote.item_image_comment
+        float: left
+        width: 335px
+        +leader()
+        font-size: 13px
+        padding: 5px
+        float: left
+        background: rgba(50, 50, 50, 0.8)
+        @include border-radius( 5px )
+        color: #ddd
+    div.item_utils
+      ul
+        padding: 5px 10px
+        @include pie-clearfix
+        li
+          float: left
+          margin-right: 20px
+          font-size: 13px

@@ -1,0 +1,73 @@
+%ul.activity
+  %li.item.item_freetext
+    %div.item_meta
+      %a{ :href => "#" }
+        %img.avatar{ :src => "http://placehold.it/48", :width => "48", :height => "48" }
+        %span.name User
+      %span.verb started
+      %a.object{ :href => "" } a thread
+      %span.time 28 minutes ago
+    %div.item_content
+      %h2
+        %a{ :href => "#" } Totally a thread title
+      %p And some text preview, maybe? Or image? Or video snapshot? Depending on what type of post it is?
+    %div.item_utils
+      %ul
+        %li
+          %a.like.tt.boxed{ :href => "", :title => "User 1 and User 2 appreciated it" } Appreciate
+        %li
+          90 readers
+        %li
+          Tagged:
+          %a.boxed{ :href => "" } meta
+          %a.boxed{ :href => "" } meaningless_rants
+          %a.boxed{ :href => "" } tag_abuse
+  %li.item.item_indirect
+    %div.item_meta
+      %a{ :href => "#" }
+        %img.avatar{ :src => "http://placehold.it/48", :width => "48", :height => "48" }
+        %span.name User
+      %span.verb replied to
+      %a.object{ :href => "" } a thread
+      %span.time 28 minutes ago
+    %div.item_content
+      %blockquote.item_reply
+        %p Hehehe, I replied to some thread you had no idea about before, but now you see it.
+    %div.item_utils
+      %ul
+        %li
+          %a.boxed{ :href => "" } View in context
+  %li.item.item_image
+    %div.item_meta
+      %a{ :href => "#" }
+        %img.avatar{ :src => "http://placehold.it/48", :width => "48", :height => "48" }
+        %span.name User
+      %span.verb uploaded
+      %a.object{ :href => "" } an image
+      %span.time 28 minutes ago
+    %div.item_content
+      %a.item_image{ :href => "#" }
+        %img{ :src => "http://placehold.it/220x240", :width => "220", :height => "240" }
+      %div.item_image_info
+        %dl
+          %dt Size:
+          %dd 1.6 MB
+        %dl
+          %dt Dimensions:
+          %dd 1456x757
+        %dl
+          %dt Source:
+          %dd http://pixiv.net/&#0133;?id=12345
+      %blockquote.item_image_comment
+        %p This picture was kind of really awesome so I decided to share it with everynyan.
+    %div.item_utils
+      %ul
+        %li
+          %a.like.tt.boxed{ :href => "", :title => "User 1 and User 2 appreciated it" } Appreciate
+        %li
+          90 viewers
+        %li
+          Tagged:
+          %a.boxed{ :href => "" } meta
+          %a.boxed{ :href => "" } meaningless_rants
+          %a.boxed{ :href => "" } tag_abuse

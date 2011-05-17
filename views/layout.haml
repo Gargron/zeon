@@ -1,21 +1,80 @@
 !!! 5
 %html
   %head
-    %meta{ :charset => 'utf-8' }
-    %title Zeon
-    %link{ :rel => 'stylesheet', :href => '/reset.css', :type => 'text/css' }
-    %link{ :rel => 'stylesheet', :href => '/style.css', :type => 'text/css' }
-  %body{ :lang => 'en' }
-    = styled_flash
-    %header
-      %a{ :href => '/' }
-        Front page
-      %form{ :method => 'post', :action => '/search' }
-        %input{ :type => 'text', :name => 'search', :placeholder => 'Search...' }>
-        %button{ :type => 'submit' }
-          %img{ :src => 'search.png' }
-    %section
-      = yield
-    %footer
-    %script{ :src => "http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js" }
-    %script{ :src => '/script.js' }
+    %meta{ :charset => "utf-8" }/
+    %title= settings.site_title
+    %link{ :href => 'http://fonts.googleapis.com/css?family=Arvo', :rel => 'stylesheet', :type => 'text/css' }
+    %link{ :href => 'http://fonts.googleapis.com/css?family=Lobster', :rel => 'stylesheet', :type => 'text/css' }
+    %link{ :rel => "stylesheet", :href => "/style/style.css", :type => "text/css" }/
+  %body{ :lang => "en" }
+    #wrapper
+      %header#header
+        %nav
+          %ul
+            %li.active.subnav_wrap
+              %a{ :href => "/" } Frontpage &#9662;
+              %ul.subnav
+                %li
+                  %a{ :href => "/" } Mentions
+                %li
+                  %a{ :href => "/" } Popular
+            %li.subnav_wrap
+              %a{ :href => "/posts" } Posts &#9662;
+              %ul.subnav
+                %li
+                  %a{ :href => "/" } New thread
+                %li
+                  %a{ :href => "/" } My threads
+                %li
+                  %a{ :href => "/" } Threads I posted in
+            %li
+              %a{ :href => "/chat" } Chat
+            %li
+              %a{ :href => "/login" } Sign in
+            %li
+              %a{ :href => "/signup" } Sign up
+        %aside
+          %a{ :href => "/", :rel => "home" }
+            %em#site_title
+              %img#logo{ :src => "/images/cl_logo.png", :width => "70", :height => "70" }
+              The
+              %strong Colorless
+      %article#main
+        %div#container
+          = yield
+        %aside#sidebar
+          %div.widget.important
+            %h4
+              %a.close{ :href => "javascript:;" } &#215;
+              Update
+            %p Hello, this is an update. It is awesome, I daresay; also commas are not that important. But it doesn't really matter, I just need placeholder text.
+          %div.widget
+            %h4 Advertising
+            %p.half_text_ad
+              %img{ :src => "http://placehold.it/200/000/555", :width => "200", :height => "200" }
+              Here comes the text,
+              %a{ :href => "#" } visit it!
+      %footer#footer
+        %nav
+          %ul
+            %li
+              %a{ :href => "/faq" } FAQ
+            %li
+              %a{ :href => "/rules" } Rules
+            %li
+              %a{ :href => "/pp" } Privacy Policy
+            %li
+              %a{ :href => "/about" } About
+            %li
+              %a{ :href => "/blog" } Blog
+            %li
+              %a{ :href => "http://twitter.com/TheColorless", :rel => "nofollow" } Our Twitter
+        %aside
+          %a.icon_button{ :href => "/feeds" }
+            %img{ :src => "/images/rss_alt_32x32.png", :width => "32", :height => "32", :alt => "Our RSS feeds" }
+    %script{ :src => "http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" }
+    :javascript
+      !window.jQuery && document.write(unescape('%3Cscript src="js/jquery.min.js"%3E%3C/script%3E'))
+    %script{ :src => "/js/plugins/jquery.showpassword.min.js" }
+    %script{ :src => "/js/plugins/jquery.tipsy.js" }
+    %script{ :src => "/js/colorless.js" }

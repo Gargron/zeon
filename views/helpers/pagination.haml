@@ -1,0 +1,13 @@
+%nav.pagination
+  %ul
+    %li
+      %a{ :href => "" }
+        %span.arrow &laquo;
+    - 1.upto 5 do |i|
+      %li{ i == 3 ? { :class => "active" } : {} }
+        %a{ :href => "" }
+          %span.circle
+          %span.number= i
+    %li
+      %a{ :href => "" }
+        %span.arrow &raquo;

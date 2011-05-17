@@ -1,6 +1,14 @@
 %form#login{ :method => 'post', :action => '/login' }
-  %label{ :for => 'login' } Login:
-  %input{ :name => 'login', :type => 'text', :placeholder => 'Login', :value => params[:login] }
-  %label{ :for => 'password' } Password:
-  %input{ :name => 'password', :type => 'password', :placeholder => 'Password' }
-  %button{ :type => 'submit' } Login
+  %fieldset
+    %legend
+      Sign in
+    %ol
+      %li
+        %label.block{ :for => 'name' } Username:
+        %input#name.extra_large{ :type => 'text', :name => 'name', :value => params[:name] }
+      %li
+        %label.block{ :for => 'password' } Password:
+        %input#password.extra_large{ :type => 'password', :name => 'password' }
+      %li
+        %button{ :type => 'submit' }
+          Sign in

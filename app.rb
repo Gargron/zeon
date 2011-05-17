@@ -12,6 +12,8 @@ require 'sinatra/session'
 require 'sinatra/flash'
 require 'sinatra/redirect_with_flash'
 
+set :site_title, 'Zeon'
+
 DataMapper.setup(:default, 'mysql://root@localhost/zeon')
 
 ## Models
@@ -165,11 +167,13 @@ class Notification
   belongs_to :parent, :model => 'Activity'
   belongs_to :user
   belongs_to :sender, :model => 'User'
+
+  after :create do
+    # Dispatch to e-mail, salmon, etc
+  end
 end
 
 DataMapper.auto_upgrade!
-
-
 
 before do
   @cur_user = User.first(:id => session[:id]) if session?
@@ -184,16 +188,8 @@ get '/' do
   end
 end
 
-get '/style.css' do
-  sass :style
-end
-
-get '/reset.css' do
-  sass :reset
-end
-
-get '/script.js' do
-  coffee :script
+get '/style/style.css' do
+  sass :style, :load_paths => [ File.dirname(__FILE__) + '/views' ]
 end
 
 
@@ -208,11 +204,11 @@ post '/activity' do
   # Create Activity
 end
 
-post '/activitiy/:id/edit' do
+post '/activitiy/:id/edit' do |id|
   # Edit Activity
 end
 
-post '/activity/:id/delete' do
+post '/activity/:id/delete' do |id|
   # Delete Activity
 end
 
@@ -234,11 +230,11 @@ end
 
 
 ## Profiles
-get '/:user/?' do |user|
+get '/user/:user/?' do |user|
   # hCard Profile
 end
 
-get '/:user/feed/?' do |user|
+get '/user/:user/feed/?' do |user|
   # Atom feed
 end 
 
@@ -253,7 +249,7 @@ end
 post '/login.json' do
   halt 303 if session?
 
-  if user = User.first(:name => params[:login], :status => [:active, :administrator]) and user.password == params[:password]
+  if user = User.first(:name => params[:name], :status => [:active, :administrator]) and user.password == params[:password]
     session_start!
     session[:id], session[:name], session[:email] = user.id, user.name, user.email
     {:status => "ok"}.to_json
@@ -265,7 +261,7 @@ end
 post '/login' do
   redirect '/' if session?
 
-  if user = User.first(:name => params[:login], :status => [:active, :administrator]) and user.password == params[:password]
+  if user = User.first(:name => params[:name], :status => [:active, :administrator]) and user.password == params[:password]
     session_start!
     session[:id], session[:name], session[:email] = user.id, user.name, user.email
     redirect '/', :success => 'Login successful!'
@@ -283,7 +279,7 @@ end
 post '/signup.json' do
   halt 303, {:error => 'You\'re already logged on.'} if session?
 
-  if user = User.create(:name => params[:login], :password => params[:password], :email => params[:email]) and user.saved?
+  if user = User.create(:name => params[:name], :password => params[:password], :email => params[:email]) and user.saved?
     session_start!
     session[:id], session[:name], session[:email] = user.id, user.name, user.email
     {:status => "ok"}.to_json
@@ -295,7 +291,7 @@ end
 post '/signup' do
   redirect '/' if session?
 
-  if user = User.create(:name => params[:login], :password => params[:password], :email => params[:email]) and user.saved?
+  if user = User.create(:name => params[:name], :password => params[:password], :email => params[:email]) and user.saved?
     session_start!
     session[:id], session[:name], session[:email] = user.id, user.name, user.email
     redirect '/', :success => "Account #{user.name} successfully created!"

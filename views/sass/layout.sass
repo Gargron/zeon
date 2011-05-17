@@ -1,0 +1,291 @@
+body
+  background: #000003 url('/images/blackblue_noise.png')
+  color: #aaa
+  @include text-shadow( #000 0 0 1px )
+
+#wrapper
+  width: 960px
+  margin: 0 auto
+
+#header
+  background: #111
+  border: 1px solid #000
+  @include border-radius( 10px )
+  @include box-shadow( inset 0 1px 1px 0 rgba(150, 150, 150, 0.4) )
+  margin: 20px 0
+  @include pie-clearfix
+
+  nav
+    float: left
+    width: 609px
+    padding: 7px 20px
+    background: rgba(0, 0, 0, 0.2)
+    border-right: 1px solid #000
+    &>ul
+      @include pie-clearfix
+      &>li
+        padding: 0 20px 0 0
+        display: block
+        float: left
+        &>a
+          display: block
+          padding: 3px 15px
+          &:hover
+            color: #fff
+
+  aside
+    width: 270px
+    padding: 10px 20px
+    padding-left: 0
+    float: right
+
+li.subnav_wrap
+  position: relative
+  &>a
+    display: block
+    padding: 3px 15px !important
+    @include border-top-radius( 5px )
+  &:hover
+    &>a
+      background: #555
+      background: rgba(85, 85, 85, 0.8)
+    ul.subnav
+      display: block
+
+ul.subnav
+  position: absolute
+  z-index: 100
+  left: 0
+  width: 200px
+  @include box-sizing( border-box )
+  @include border-top-right-radius ( 5px )
+  @include border-bottom-radius( 5px )
+  padding: 5px
+  background: #555
+  background: rgba(85, 85, 85, 0.8)
+  text-align: left
+  display: none
+  li
+    a
+      display: block
+      padding: 3px 0 3px 10px
+      font-weight: normal
+      &:hover
+        background: #444
+        background: rgba(51, 51, 51, 0.8)
+
+#footer
+  padding: 0 20px 50px
+  @include clearfix
+
+  nav
+    float: left
+    width: 300px
+    ul
+      width: 300px
+      @include column-count( 2 )
+
+  aside
+    float: right
+    width: 300px
+    @include clearfix
+    .icon_button
+      float: right
+      margin-left: 10px
+
+.icon_button
+  display: block
+  width: 32px
+  height: 32px
+  padding: 20px
+  background: rgba(30, 30, 30, 0.7)
+  @include border-radius( 10px )
+  @include box-shadow( inset 0 0 20px rgba(0, 0, 0, 0.1) )
+  opacity: 0.8
+  &:hover
+    opacity: 1
+
+#main
+  background: #222224 url('/images/greyblue_noise.png')
+  border: 1px solid #111
+  border-top-color: #444
+  padding: 20px 0
+  // @include box-shadow( inset 0 20px 150px rgba(10, 10, 10, 0.2), 0 10px 30px rgba(0, 0, 0, 0.5) )
+  @include border-radius( 10px )
+  @include clearfix
+  margin-bottom: 20px
+
+#container
+  width: 610px
+  padding: 0 20px
+  float: left
+
+#sidebar
+  width: 270px
+  margin-left: 20px
+  float: left
+
+  .widget
+    background: rgba(0, 0, 0, 0.4)
+    border: 1px solid #111
+    border-bottom-color: #444
+    padding: 10px
+    @include trailer()
+    @include border-radius( 10px )
+    @include box-shadow( inset 0 10px 10px rgba(0, 0, 0, 0.2) )
+    &.important
+      color: #7ca27c
+      background: rgba(17, 32, 17, 0.4)
+      border-bottom-color: #4c6c4c
+    a.close
+      display: block
+      float: right
+
+.half_text_ad
+  text-align: center
+  img
+    display: block
+    margin: 0 auto
+    @include trailer()
+  a
+    font-weight: bold
+
+@import streams
+
+ul.breadcrumb
+  display: block
+  width: 650px
+  margin-top: -20px
+  margin-left: -20px
+  @include trailer()
+  box-sizing: border-box
+  background: #111
+  @include border-top-left-radius( 10px )
+  @include border-bottom-right-radius( 10px )
+  @include box-shadow( inset 0 0 10px rgba(0, 0, 0, 0.2) )
+  border: 1px solid #000
+  border-left: 0
+  border-bottom-color: #333
+  +clearfix
+  li
+    color: #aaa
+    background: #444
+    text-shadow: #000 0 1px 1px
+    font-weight: bold
+    border-top: 1px solid #555
+    border-left: 1px solid #222
+    border-bottom: 1px solid #000
+    font-size: 14px
+    line-height: 24px
+    float: left
+    padding: 10px 34px
+    margin-right: 1px
+    position: relative
+    span.number
+      display: inline-block
+      background: #6c8498
+      border: 1px solid #5d7385
+      padding: 0 6px
+      border-radius: 3px
+      border-bottom-color: #bcc7d0
+      border-right-color: #bcc7d0
+    &:before
+      display: block
+      content: ' '
+      position: absolute
+      border-color: transparent transparent transparent #000
+      border-style: solid
+      border-width: 24px
+      width: 0
+      height: 0
+      right: -47px
+      top: -2px
+      z-index: 2
+      box-shadow: none
+    &:after
+      display: block
+      content: ' '
+      position: absolute
+      border-color: transparent transparent transparent #444
+      border-style: solid
+      border-width: 22px
+      width: 0
+      height: 0
+      right: -43px
+      top: 0
+      z-index: 3
+      box-shadow: none
+    &:first-child
+      padding-left: 20px
+      @include border-top-left-radius( 10px )
+
+nav.pagination
+  display: block
+  width: 100%
+  border-top: 1px solid #555
+  @include leader()
+  position: relative
+  top: 9px
+  ul
+    +clearfix
+    text-align: center
+    position: relative
+    top: -9px
+    li
+      display: inline-block
+      padding: 0 20px
+      a
+        text-decoration: none
+        font-size: 12px
+        font-weight: bold
+        span.circle
+          display: block
+          background: #111
+          border: 4px solid #555
+          width: 12px
+          height: 12px
+          @include border-radius( 16px )
+          @include box-shadow( inset 0 0 6px rgba(0, 0, 0, 0.3) )
+        &:hover
+          color: #fff
+          span.circle
+            border-color: #666
+      &.active
+        span.circle
+          background-color: #88c6e0
+          @include box-shadow( inset 0 0 6px rgba(0, 0, 0, 0.3), 0 0 3px rgba(136, 198, 224, 0.25) )
+
+.tipsy
+  padding: 3px
+  font-size: 11px
+  opacity: 0.8
+  filter: alpha(opacity=80)
+  background-repeat: no-repeat
+  padding: 5px
+  &:after
+    display: block
+    content: ' '
+    position: absolute
+    border-color: transparent transparent transparent #000
+    border-style: solid
+    border-width: 5px
+    width: 0
+    height: 0
+    left: 50%
+    top: 0
+  .tipsy-inner
+    padding: 2px 5px
+    background-color: black
+    color: white
+    max-width: 200px
+    text-align: center
+    @include border-radius( 3px )
+
+a.boxed
+  padding: 0 6px
+  @include border-radius( 3px )
+  background: #0d0d0d
+  text-decoration: none
+  display: inline-block
+  &:hover
+    background: #101010

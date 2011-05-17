@@ -1,8 +1,23 @@
-%form{ :action => '/signup', :method => 'post' }
-  %label{ :for => 'login' } Login:
-  %input{ :name => 'login', :type => 'text', :placeholder => 'Login', :value => params[:login] }
-  %label{ :for => 'password' } Password:
-  %input{ :name => 'password', :type => 'password', :placeholder => 'Password' }
-  %label{ :for => 'email' } E-mail:
-  %input{ :name => 'email', :type => 'text', :placeholder => 'E-mail', :value => params[:email] }
-  %button{ :type => 'submit' } Sign Up
+%form#signup{ :method => 'post', :action => '/signup' }
+  %fieldset
+    %legend
+      Sign up
+    %ol
+      %li
+        %label.block{ :for => 'name' } Desired username:
+        %input#name.extra_large{ :type => 'text', :name => 'name', :value => params[:name], :placeholder => "[A-Za-z0-9_-]{1-30}" }
+      %li
+        %label.block{ :for => 'email' } E-mail:
+        %input#email.extra_large{ :type => 'email', :name => 'email', :value => params[:email], :placeholder => "valid.email.please@thankyou.com" }
+      %li
+        %label.block{ :for => 'password' } Password:
+        %input#password.extra_large{ :type => 'password', :name => 'password' }
+        %div.box
+      %li{ :style => "display:none" }
+        %input{ :type => "text", :name => "honeydew", :value => "" }
+      %li
+        By signing up you agree to our rules and terms of service. We will not spam your e-mail address &mdash; we hate spam like you do.
+      %li
+        %button{ :type => 'submit' }
+          Sign up
+        %em.pretty_italic &mdash; Don't worry, signing up is free
