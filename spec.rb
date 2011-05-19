@@ -112,14 +112,14 @@ describe 'Zeon' do
     describe "with replies" do
       before :all do
         @bookmark = Activity.create(
-          :activity => @activity1,
+          :parent => @activity1,
           :user => @keri,
           :type => :bookmark,
           :title => 'Bookmark'
         )
 
         @activity1_reply = Activity.create(
-          :activity => @activity1,
+          :parent => @activity1,
           :user => @gargron,
           :type => :reply,
           :title => 'I like',
@@ -127,7 +127,7 @@ describe 'Zeon' do
         )
 
         @activity2_reply = Activity.create(
-          :activity => @activity1,
+          :parent => @activity1,
           :user => @dc,
           :type => :reply,
           :title => 'Same here',

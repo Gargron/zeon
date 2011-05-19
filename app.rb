@@ -106,7 +106,7 @@ class Activity
   property :type, Enum[ :post, :reply, :comment, :link, :image,
     :video, :question, :event, :like, :bookmark, :vote, :tag,
     :attendance, :invitation, :poke, :recommendation, :message,
-    :announcement ], :required => true, :index => true
+    :announcement, :follow, :unfollow ], :required => true, :index => true
   property :title, String, :required => true
   property :content, Text
   property :meta, Json
@@ -114,20 +114,23 @@ class Activity
   property :created_at, DateTime
 
   belongs_to :user
-  belongs_to :activity, :required => false
+  belongs_to :parent, :model => 'Activity', :required => false
   belongs_to :group, :required => false
 
-  has n, :activities
+  has n, :children, :model => 'Activity', :child_key => [ :parent_id ]
   has n, :notifications
   has n, :tags, :through => Resource, :constraint => :destroy
 
+  ## Constants
   CONTENT = [ :post, :reply, :comment, :link, :image, :video, :question, :event ]
   REPLY = [ :reply, :comment, :like, :vote, :tag, :attendance ]
+  SPECIFIC = [ :follow, :unfollow ]
   PRIVATE = [ :bookmark, :vote, :invitation, :poke, :reccomendation, :message ]
   MENTION = /@([a-z1-9]+)/i
   HASHTAG = /#([a-z1-9]+)/i
   GROUPTAG = /~([a-z1-9]+)/i
 
+  ## Callbacks
   after :create do
     unless PRIVATE.include? type
       mentions = User.all(:name => content.scan(MENTION))
@@ -135,21 +138,21 @@ class Activity
       self.group = Group.first(:name => content.scan(GROUPTAG))
       self.save
 
-      root = self.activity || self
+      root = self.parent || self
       notify(:mention, mentions)
       notify(:group, root.group.users) if root.group
       notify(:tag, root.tags.users)
       notify(:activity, self.user.friendships2.all(:accepted => true).users)
       notify(:mine, [ root.user ])
-      notify(:bookmark, root.activities(:type => :bookmark).users)
-      notify(:replied, root.activities(:type => :reply).users)
-      notify(:liked, root.activities(:type => :like).users)
+      notify(:bookmark, root.children(:type => :bookmark).users)
+      notify(:replied, root.children(:type => :reply).users)
+      notify(:liked, root.children(:type => :like).users)
     end
   end
 
   def notify(kind, users)
     users.each do |target|
-      self.notifications << Notification.create(:kind => kind, :user => target, :sender => self.user, :activity => self, :parent => self.activity || self)
+      self.notifications << Notification.create(:kind => kind, :user => target, :sender => self.user, :activity => self, :parent => self.parent || self)
     end
   end
 end
