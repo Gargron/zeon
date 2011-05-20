@@ -1,4 +1,29 @@
 %ul.activity
+  - if session?
+    - @dashboard.each do |activity|
+      %li.item.item_freetext
+        %div.item_meta
+          %a{ :href => "#" }
+            %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
+            %span.name= activity.user.name
+          %span.verb posted
+          %a.object{ :href => "" } a thread
+          %span.time= ago(activity.created_at)
+        %div.item_content
+          %h2
+            %a{ :href => "#" }= activity.title
+          %p= activity.content
+        %div.item_utils
+          %ul
+            %li
+              %a.like.tt.boxed{ :href => "", :title => "User 1 and User 2 appreciated it" } Appreciate
+            %li
+              90 readers
+            %li
+              Tagged:
+              - activity.tags.each do |tag|
+                %a.boxed{ :href => "" }= tag.name
+
   %li.item.item_freetext
     %div.item_meta
       %a{ :href => "#" }

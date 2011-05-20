@@ -179,12 +179,33 @@ DataMapper.auto_upgrade!
 
 before do
   @cur_user = User.first(:id => session[:id]) if session?
+  if session? and !@cur_user
+    session_end!
+    redirect '/'
+  end
 end
+
+helpers do
+  def ago(time)
+    diff = Time.now - Time.parse(time.to_s)
+    ranges = { :second => 1..59, :minute => 60..3559, :hour => 3600..86399,
+      :day => 86400..2592000, :month => 2592000..31104000, :year => 31104000..999999999 }
+
+    return 'just now' if diff < 5
+
+    ranges.collect do |n,r|
+      "#{(diff/r.first).ceil} #{n}#{'s' if (diff/r.first).ceil > 1} ago" if r.include? diff
+    end.join
+  end
+end
+
 
 ## Controllers
 get '/' do
   if session?
-    haml :dashboard
+    @dashboard = @cur_user.notifications.activities(:order => :id.desc)
+
+    haml :index
   else
     haml :index
   end
