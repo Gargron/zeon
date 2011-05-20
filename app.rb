@@ -6,13 +6,18 @@ require 'openssl'
 require 'redis'
 require 'proudhon'
 
+require 'yaml'
+
 require 'sinatra/jsonp'
 require 'sinatra/session'
 require 'sinatra/flash'
 require 'sinatra/redirect_with_flash'
 
-set :site_title, 'Zeon'
-DataMapper.setup(:default, 'mysql://root@localhost/zeon')
+
+config = YAML.load_file('config.yml')
+
+set :site_title, config['site_title']
+DataMapper.setup(:default, config['mysql'])
 
 ## Models
 class User
@@ -175,7 +180,12 @@ class Notification
 end
 
 DataMapper.finalize
-DataMapper.auto_migrate!
+
+if(config['migrate'] == 'true')
+  DataMapper.auto_migrate!
+else
+  DataMapper.auto_upgrade!
+end
 
 before do
   @cur_user = User.first(:id => session[:id]) if session?
@@ -259,7 +269,7 @@ end
 
 get '/user/:user/feed/?' do |user|
   # Atom feed
-end 
+end
 
 
 ## Access Control
