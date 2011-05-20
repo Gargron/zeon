@@ -1,7 +1,7 @@
 body
   background: #000003 url('/images/blackblue_noise.png')
   color: #aaa
-  @include text-shadow( #000 0 0 1px )
+  text-shadow: #000 0 0 1px
 
 #wrapper
   width: 960px
@@ -10,10 +10,10 @@ body
 #header
   background: #111
   border: 1px solid #000
-  @include border-radius( 10px )
-  @include box-shadow( inset 0 1px 1px 0 rgba(150, 150, 150, 0.4) )
+  border-radius: 10px
+  box-shadow: inset 0 1px 1px 0 rgba(150, 150, 150, 0.4)
   margin: 20px 0
-  @include pie-clearfix
+  +clearfix
 
   nav
     float: left
@@ -22,7 +22,7 @@ body
     background: rgba(0, 0, 0, 0.2)
     border-right: 1px solid #000
     &>ul
-      @include pie-clearfix
+      +clearfix
       &>li
         padding: 0 20px 0 0
         display: block
@@ -44,7 +44,8 @@ li.subnav_wrap
   &>a
     display: block
     padding: 3px 15px !important
-    @include border-top-radius( 5px )
+    border-top-left-radius: 5px
+    border-top-right-radius: 5px
   &:hover
     &>a
       background: #555
@@ -57,9 +58,10 @@ ul.subnav
   z-index: 100
   left: 0
   width: 200px
-  @include box-sizing( border-box )
-  @include border-top-right-radius ( 5px )
-  @include border-bottom-radius( 5px )
+  box-sizing: border-box
+  border-top-right-radius: 5px
+  border-bottom-left-radius: 5px
+  border-bottom-right-radius: 5px
   padding: 5px
   background: #555
   background: rgba(85, 85, 85, 0.8)
@@ -76,19 +78,25 @@ ul.subnav
 
 #footer
   padding: 0 20px 50px
-  @include clearfix
+  overflow: hidden
+  *zoom: 1
 
   nav
     float: left
     width: 300px
     ul
       width: 300px
-      @include column-count( 2 )
+      overflow: hidden
+      *zoom: 1
+      &>li
+        width: 150px
+        float: left
 
   aside
     float: right
     width: 300px
-    @include clearfix
+    overflow: hidden
+    *zoom: 1
     .icon_button
       float: right
       margin-left: 10px
@@ -99,8 +107,8 @@ ul.subnav
   height: 32px
   padding: 20px
   background: rgba(30, 30, 30, 0.7)
-  @include border-radius( 10px )
-  @include box-shadow( inset 0 0 20px rgba(0, 0, 0, 0.1) )
+  border-radius: 10px
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1)
   opacity: 0.8
   &:hover
     opacity: 1
@@ -110,9 +118,9 @@ ul.subnav
   border: 1px solid #111
   border-top-color: #444
   padding: 20px 0
-  // @include box-shadow( inset 0 20px 150px rgba(10, 10, 10, 0.2), 0 10px 30px rgba(0, 0, 0, 0.5) )
-  @include border-radius( 10px )
-  @include clearfix
+  border-radius: 10px
+  overflow: hidden
+  *zoom: 1
   margin-bottom: 20px
 
 #container
@@ -130,9 +138,9 @@ ul.subnav
     border: 1px solid #111
     border-bottom-color: #444
     padding: 10px
-    @include trailer()
-    @include border-radius( 10px )
-    @include box-shadow( inset 0 10px 10px rgba(0, 0, 0, 0.2) )
+    margin-bottom: 1.5em
+    border-radius: 10px
+    box-shadow: inset 0 10px 10px rgba(0, 0, 0, 0.2)
     &.important
       color: #7ca27c
       background: rgba(17, 32, 17, 0.4)
@@ -146,27 +154,29 @@ ul.subnav
   img
     display: block
     margin: 0 auto
-    @include trailer()
+    margin-bottom: 1.5em
   a
     font-weight: bold
 
 @import streams
+@import posts
 
 ul.breadcrumb
   display: block
   width: 650px
   margin-top: -20px
   margin-left: -20px
-  @include trailer()
+  margin-bottom: 1.5em
   box-sizing: border-box
   background: #111
-  @include border-top-left-radius( 10px )
-  @include border-bottom-right-radius( 10px )
-  @include box-shadow( inset 0 0 10px rgba(0, 0, 0, 0.2) )
+  border-top-left-radius: 10px
+  border-bottom-right-radius: 10px
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2)
   border: 1px solid #000
   border-left: 0
   border-bottom-color: #333
-  +clearfix
+  overflow: hidden
+  *zoom: 1
   li
     color: #aaa
     background: #444
@@ -217,17 +227,19 @@ ul.breadcrumb
       box-shadow: none
     &:first-child
       padding-left: 20px
-      @include border-top-left-radius( 10px )
+      border-top-left-radius: 10px
 
 nav.pagination
   display: block
   width: 100%
   border-top: 1px solid #555
-  @include leader()
+  margin-top: 1.5em
+  margin-bottom: 1.5em
   position: relative
   top: 9px
   ul
-    +clearfix
+    overflow: hidden
+    *zoom: 1
     text-align: center
     position: relative
     top: -9px
@@ -244,8 +256,8 @@ nav.pagination
           border: 4px solid #555
           width: 12px
           height: 12px
-          @include border-radius( 16px )
-          @include box-shadow( inset 0 0 6px rgba(0, 0, 0, 0.3) )
+          border-radius: 16px
+          box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3)
         &:hover
           color: #fff
           span.circle
@@ -253,7 +265,7 @@ nav.pagination
       &.active
         span.circle
           background-color: #88c6e0
-          @include box-shadow( inset 0 0 6px rgba(0, 0, 0, 0.3), 0 0 3px rgba(136, 198, 224, 0.25) )
+          box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3), 0 0 3px rgba(136, 198, 224, 0.25)
 
 .tipsy
   padding: 3px
@@ -279,11 +291,11 @@ nav.pagination
     color: white
     max-width: 200px
     text-align: center
-    @include border-radius( 3px )
+    border-radius: 3px
 
 a.boxed
   padding: 0 6px
-  @include border-radius( 3px )
+  border-radius: 3px
   background: #0d0d0d
   text-decoration: none
   display: inline-block

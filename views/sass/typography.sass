@@ -1,10 +1,15 @@
-+establish-baseline( 15px )
+body
+  font-size: 93.75%
+  line-height: 1.6em
+
+html > body
+  font-size: 15px
 
 body
   font-family: "Helvetica Neue", Helvetica, Arial, Verdana, sans-serif
 
 h1, h2, h3, h4, h5, h6
-  +trailer
+  margin-bottom: 1.5em
 
 a
   color: inherit
@@ -44,14 +49,11 @@ form
   text-align: center
 
 .widget
-  @include text-shadow(none)
+  text-shadow: none
   font-size: 12px
   h4
-    // text-transform: uppercase
-    // font-size: 12px
     font-size: 18px
-    @include text-shadow(#000 1px 1px 0)
-    // font-weight: bold
+    text-shadow: #000 1px 1px 0
     text-align: center
     font-family: 'Lobster', "Helvetica Neue", Helvetica, Arial, Verdana, sans-serif
 

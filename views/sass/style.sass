@@ -1,8 +1,13 @@
-@import compass/reset
-@include reset-html5
-@import compass/utilities
-@import compass/typography
-@import compass/css3
+@import reset
+
+=clearfix
+  *display:                 inline-block
+  &:after
+    content:                " "
+    display:                block
+    height:                 0
+    clear:                  both
+    visibility:             hidden
 
 @import layout
 @import typography

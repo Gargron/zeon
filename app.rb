@@ -6,7 +6,6 @@ require 'openssl'
 require 'redis'
 require 'proudhon'
 
-require 'coffee-script'
 require 'sinatra/jsonp'
 require 'sinatra/session'
 require 'sinatra/flash'
@@ -175,7 +174,8 @@ class Notification
   end
 end
 
-DataMapper.auto_upgrade!
+DataMapper.finalize
+DataMapper.auto_migrate!
 
 before do
   @cur_user = User.first(:id => session[:id]) if session?
@@ -212,7 +212,7 @@ get '/' do
 end
 
 get '/style/style.css' do
-  sass :style, :load_paths => [ File.dirname(__FILE__) + '/views' ]
+  sass :"sass/style", :load_paths => [ File.dirname(__FILE__) + '/views' ]
 end
 
 

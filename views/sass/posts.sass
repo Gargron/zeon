@@ -1,0 +1,46 @@
+ul.posts
+  list-style: none
+  li.item
+    background: rgba(30, 30, 30, 0.9)
+    border: 1px solid #131313
+    border-radius: 10px
+    margin-bottom: 1.5em
+    box-shadow: 0 1px 1px 2px rgba(0, 0, 0, 0.1), inset 0 1px 1px 0 #444
+    div.item_content
+      padding: 10px
+      h2
+        font-size: 18px
+        font-family: 'Arvo', "Helvetica Neue", Helvetica, Arial, Verdana, sans-serif
+        margin: 0.267em 0
+        a
+          text-decoration: none
+          color: #88c6e0
+    div.item_utils
+      padding: 0 10px 1em 10px
+    div.item_meta
+      border-top: 1px solid #101010
+      ul
+        list-style: none
+        overflow: hidden
+        *zoom: 1
+        li
+          float: left
+          width: 180px
+          padding: 10px
+          border-right: 1px solid #101010
+          &:last-child
+            border-right: 0
+          a
+            text-decoration: none
+            &:hover
+              text-decoration: underline
+          span.time, span.views, span.posts
+            display: block
+          span.name
+            font-weight: bold
+          img.avatar
+            float: left
+            margin-right: 10px
+            border: 4px solid #111
+            width: 44px
+            height: 44px
