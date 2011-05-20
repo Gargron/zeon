@@ -13,7 +13,6 @@ require 'sinatra/flash'
 require 'sinatra/redirect_with_flash'
 
 set :site_title, 'Zeon'
-
 DataMapper.setup(:default, 'mysql://root@localhost/zeon')
 
 ## Models
