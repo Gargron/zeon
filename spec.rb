@@ -12,11 +12,11 @@ describe 'Zeon' do
 
     # Nodes
     @glassx = User.create(:name => 'glassx', :password => '123456', :email => 'glassx.x@gmail.com')
-    @gargron = User.create(:name => 'gargron', :password => '123456', :email => 'gargron@gmail.com', :blob => { :private => true })
+    @gargron = User.create(:name => 'Gargron', :password => '123456', :email => 'gargron@gmail.com', :blob => { :private => true })
     @acostoss = User.create(:name => 'acostoss', :password => 'poodle', :email => 'acostoss@gmail.com')
-    @dc = User.create(:name => 'darkchaplain', :password => 'steve_jobs', :email => 'thedarkchaplain@gmail.com')
+    @dc = User.create(:name => 'DarkChaplain', :password => 'steve_jobs', :email => 'thedarkchaplain@gmail.com')
     @candy = User.create(:name => 'candytenshi', :password => '54321', :email => 'candytenshi@gmail.com')
-    @keri = User.create(:name => 'keri', :password => 'blimey', :email => 'keri@keri.co.uk')
+    @keri = User.create(:name => 'Keri', :password => 'blimey', :email => 'keri@keri.co.uk')
 
     @colorless = Tag.create(:name => 'colorless')
     @anime = Tag.create(:name => 'anime')
@@ -138,11 +138,11 @@ describe 'Zeon' do
       it "should trigger creator notifications" do
         @glassx.notifications.first(:activity => @activity1_reply).kind.should == :mine
       end
-      
+
       it "should trigger group notifications" do
         @candy.notifications.first(:activity => @activity1_reply).kind.should == :group
       end
-      
+
       it "should trigger tag notifications" do
         @acostoss.notifications.first(:activity => @activity1_reply).kind.should == :tag
       end
@@ -153,7 +153,7 @@ describe 'Zeon' do
 
       it "should trigger replier notifications" do
         @gargron.notifications.first(:activity => @activity2_reply).kind.should == :replied
-      end      
+      end
     end
   end
 
@@ -177,8 +177,8 @@ describe 'Zeon' do
       @activity2 = Activity.create(
         :user => @gargron,
         :type => :post,
-        :title => 'WTF',
-        :content => 'That pesky @glassx dude wants to follow me but I won\'t let him, hope he doesn\'t see this message!'
+        :title => 'Whoa what',
+        :content => 'So @glassx was here but will he see this mention?'
       )
     end
 

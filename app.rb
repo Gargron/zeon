@@ -17,6 +17,7 @@ require 'sinatra/redirect_with_flash'
 config = YAML.load_file('config.yml')
 
 set :site_title, config['site_title']
+set :show_exceptions, TRUE
 DataMapper.setup(:default, config['mysql'])
 
 ## Models
@@ -128,7 +129,7 @@ class Activity
   CONTENT = [ :post, :reply, :comment, :link, :image, :video, :question, :event ]
   REPLY = [ :reply, :comment, :like, :vote, :tag, :attendance ]
   SPECIFIC = [ :follow, :unfollow ]
-  PRIVATE = [ :bookmark, :vote, :invitation, :poke, :reccomendation, :message ]
+  PRIVATE = [ :bookmark, :vote, :invitation, :poke, :recommendation, :message ]
   MENTION = /@([a-z1-9]+)/i
   HASHTAG = /#([a-z1-9]+)/i
   GROUPTAG = /~([a-z1-9]+)/i
@@ -151,6 +152,10 @@ class Activity
       notify(:replied, root.children(:type => :reply).users)
       notify(:liked, root.children(:type => :like).users)
     end
+  end
+
+  def self.public
+      all(:type.in => CONTENT, :parent_id => nil)
   end
 
   def notify(kind, users)
@@ -215,10 +220,16 @@ get '/' do
   if session?
     @dashboard = @cur_user.notifications.activities(:order => :id.desc)
 
-    haml :index
+    haml :dashboard
   else
+    @index = Activity.public.all( :order => :id.desc )
+
     haml :index
   end
+end
+
+get '/thread/:id' do |id|
+  
 end
 
 get '/style/style.css' do

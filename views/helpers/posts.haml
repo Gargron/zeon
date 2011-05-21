@@ -1,25 +1,27 @@
 %ul.posts
-  %li.item
-    %div.item_content
-      %h2
-        %a{ :href => "" } Thread title
-    %div.item_utils
-      Tagged:
-      %a.boxed{ :href => "" } a_tag
-      %a.boxed{ :href => "" } something
-    %div.item_meta
-      %ul
-        %li
-          %a{ :href => "" }
-            %img.avatar{ :src => "http://placehold.it/48", :width => 
-"48", :height => "48" }
-            %span.name User
-          %span.time 1 hour ago
-        %li
-          %span.views 90 readers
-          %span.posts 4 replies
-        %li
-          %a.last_reply{ :href => "" }
-            %span.what Last reply by
-            %span.name User2
-            %span.time 30 minutes ago
+  - @index.each do |activity|
+    %li.item
+      %div.item_content
+        %h2
+          %a{ :href => "" }= activity.title
+      %div.item_utils
+        Tagged:
+        - activity.tags.each do |tag|
+          %a.boxed{ :href => "" }= tag.name
+      %div.item_meta
+        %ul
+          %li
+            %a{ :href => "" }
+              %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
+              %span.name= activity.user.name
+            %span.time= ago(activity.created_at)
+          %li
+            %span.views 0 readers
+            %span.posts
+              = activity.children.count
+              replies
+          %li
+            %a.last_reply{ :href => "" }
+              %span.what Last reply by
+              %span.name User2
+              %span.time 0 minutes ago
