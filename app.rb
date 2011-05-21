@@ -218,18 +218,20 @@ end
 ## Controllers
 get '/' do
   if session?
-    @dashboard = @cur_user.notifications.activities(:order => :id.desc)
+    @activity = @cur_user.notifications.activities(:order => :id.desc)
 
     haml :dashboard
   else
-    @index = Activity.public.all( :order => :id.desc )
+    @posts = Activity.public.all( :order => :id.desc )
 
     haml :index
   end
 end
 
 get '/thread/:id' do |id|
-  
+  @conversation = Activity.all( :conditions => ["id = ? or parent_id = ?", id, id], :order => :id.asc )
+
+  haml :thread
 end
 
 get '/style/style.css' do
