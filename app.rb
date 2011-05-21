@@ -210,6 +210,8 @@ helpers do
     window_to = current_page + inner_window
     @links = []
 
+    return nil unless total_pages > 1
+
     if window_to > total_pages
       window_from -= window_to - total_pages
       window_to = total_pages
@@ -267,7 +269,7 @@ end
 get %r{/home(/page/([\d]+))?} do |o, p|
   session!
 
-  @activity = @cur_user.notifications.activities(:order => :id.desc).paginate({ :page => p, :per_page => 2})
+  @activity = @cur_user.notifications.activities(:order => :id.desc).paginate({ :page => p, :per_page => 20})
 
   haml :dashboard
 end

@@ -11,28 +11,34 @@
       %header#header
         %nav
           %ul
-            %li.active.subnav_wrap
+            %li.subnav_wrap
               %a{ :href => "/" } Frontpage &#9662;
               %ul.subnav
-                %li
-                  %a{ :href => "/" } Mentions
+                - if session?
+                  %li
+                    %a{ :href => "/" } Mentions
                 %li
                   %a{ :href => "/" } Popular
-            %li.subnav_wrap
-              %a{ :href => "/posts" } Posts &#9662;
-              %ul.subnav
-                %li
-                  %a{ :href => "/" } New thread
-                %li
-                  %a{ :href => "/" } My threads
-                %li
-                  %a{ :href => "/" } Threads I posted in
+            - if session?
+              %li.subnav_wrap
+                %a{ :href => "/posts" } Posts &#9662;
+                %ul.subnav
+                  %li
+                    %a{ :href => "/" } New thread
+                  %li
+                    %a{ :href => "/" } My threads
+                  %li
+                    %a{ :href => "/" } Threads I posted in
             %li
               %a{ :href => "/chat" } Chat
-            %li
-              %a{ :href => "/login" } Sign in
-            %li
-              %a{ :href => "/signup" } Sign up
+            - if !session?
+              %li
+                %a{ :href => "/login" } Sign in
+              %li
+                %a{ :href => "/signup" } Sign up
+            - else
+              %li
+                %a{ :href => "/logout" } Sign out
         %aside
           %a{ :href => "/", :rel => "home" }
             %em#site_title
