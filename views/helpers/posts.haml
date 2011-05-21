@@ -3,11 +3,11 @@
     %li.item
       %div.item_content
         %h2
-          %a{ :href => "" }= activity.title
+          %a{ :href => "/thread/" + activity.id.to_s }= activity.title
       %div.item_utils
         Tagged:
         - activity.tags.each do |tag|
-          %a.boxed{ :href => "" }= tag.name
+          %a.boxed{ :href => "/tag/" + tag.name }= tag.name
       %div.item_meta
         %ul
           %li

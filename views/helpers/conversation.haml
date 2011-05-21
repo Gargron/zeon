@@ -1,11 +1,14 @@
 %ul.conversation
   - @conversation.each do |activity|
-    %li.item
-      %div.item_meta
-        %a{ :href => "" }
-          %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
-          %span.name= activity.user.name
-        %span.id= "#" + activity.id.to_s
-        %span.time= ago(activity.created_at)
-      %div.item_content
-        = activity.content
+    - if activity.type == :post || activity.type == :reply
+      %li.item
+        %div.item_meta
+          %a.author{ :href => "" }
+            %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
+            %span.name= activity.user.name
+          %span.id= "#" + activity.id.to_s
+          %span.time= ago(activity.created_at)
+        %div.item_content
+          - if activity.type == :post
+            %h2= activity.title
+          = activity.content

@@ -1,37 +1,45 @@
 %ul.activity
   - if session?
     - @activity.each do |activity|
-      - if activity.type == :post
+      - if activity.type == :post || activity.type == :like
         %li.item.item_freetext
           %div.item_meta
             %a{ :href => "#" }
               %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
               %span.name= activity.user.name
-            %span.verb posted
-            %a.object{ :href => "" } a thread
+            - if activity.type == :post
+              %span.verb posted
+              %a.object{ :href => "" } a thread
+            - if activity.type == :like
+              %span.verb liked
+              %a.object{ :href => "" }
+                = activity.parent.user.name + "'s"
+                thread
             %span.time= ago(activity.created_at)
           %div.item_content
             %h2
-              %a{ :href => "#" }= activity.title
+              %a{ :href => "/thread/" + activity.id.to_s }= activity.title
             %p= activity.content
           %div.item_utils
             %ul
               %li
-                %a.like.tt.boxed{ :href => "" } Appreciate
+                %a.like.boxed{ :href => "" } Appreciate
               %li
                 0 readers
               %li
                 Tagged:
                 - activity.tags.each do |tag|
-                  %a.boxed{ :href => "" }= tag.name
-      - if activity.type == :reply
+                  %a.boxed{ :href => "/tag/" + tag.name }= tag.name
+      - if activity.type == :reply || activity.type == :comment
         %li.item.item_indirect
           %div.item_meta
             %a{ :href => "#" }
               %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
               %span.name= activity.user.name
             %span.verb replied to
-            %a.object{ :href => "" } a thread
+            %a.object{ :href => "" }
+              = activity.parent.user.name + "'s"
+              thread
             %span.time= ago(activity.created_at)
           %div.item_content
             %blockquote.item_reply
@@ -39,7 +47,7 @@
           %div.item_utils
             %ul
               %li
-                %a.boxed{ :href => "" } View in context
+                %a.boxed{ :href => "/thread/" + activity.parent.id.to_s } View in context
       - if activity.type == :image
         %li.item.item_image
           %div.item_meta
@@ -67,7 +75,7 @@
           %div.item_utils
             %ul
               %li
-                %a.like.tt.boxed{ :href => "" } Appreciate
+                %a.like.boxed{ :href => "" } Appreciate
               %li
                 0 viewers
               %li
