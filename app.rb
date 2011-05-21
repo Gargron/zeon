@@ -12,7 +12,7 @@ require 'sinatra/jsonp'
 require 'sinatra/session'
 require 'sinatra/flash'
 require 'sinatra/redirect_with_flash'
-
+require 'will_paginate'
 
 config = YAML.load_file('config.yml')
 
@@ -201,6 +201,41 @@ before do
 end
 
 helpers do
+  def will_paginate(collection)
+    total_pages, current_page = collection.total_pages, collection.current_page
+    prev = nil
+    gap_marker = '&hellip;'
+    inner_window, outer_window = 4, 1
+    window_from = current_page - inner_window
+    window_to = current_page + inner_window
+    @links = []
+
+    if window_to > total_pages
+      window_from -= window_to - total_pages
+      window_to = total_pages
+    end
+    if window_from < 1
+      window_to += 1 - window_from
+      window_from = 1
+      window_to = total_pages if window_to > total_pages
+    end
+
+    visible   = (1..total_pages).to_a
+    left_gap  = (2 + outer_window)...window_from
+    right_gap = (window_to + 1)...(total_pages - outer_window)
+    visible  -= left_gap.to_a  if left_gap.last - left_gap.first > 1
+    visible  -= right_gap.to_a if right_gap.last - right_gap.first > 1
+
+    visible.inject [] do |links, n|
+      links << {:text => gap_marker, :link => false, :active => false} if prev and n > prev + 1
+      links << {:text => n, :link => n != current_page ? true : false, :active => n != current_page ? false : true}
+      prev = n
+      @links = links
+    end
+
+    haml :"helpers/pagination"
+  end
+
   def ago(time)
     diff = Time.now - Time.parse(time.to_s)
     ranges = { :second => 1..59, :minute => 60..3559, :hour => 3600..86399,
@@ -214,22 +249,31 @@ helpers do
   end
 end
 
-
 ## Controllers
 get '/' do
   if session?
-    @activity = @cur_user.notifications.activities(:order => :id.desc)
-
-    haml :dashboard
+    redirect '/home'
   else
-    @posts = Activity.public.all( :order => :id.desc )
-
-    haml :index
+    redirect '/all'
   end
 end
 
-get '/thread/:id' do |id|
-  @conversation = Activity.all( :conditions => ["id = ? or parent_id = ?", id, id], :order => :id.asc )
+get %r{/all(/page/([\d]+))?} do |o, p|
+    @posts = Activity.public.all( :order => :id.desc ).paginate({ :page => p, :per_page => 20})
+
+    haml :index
+end
+
+get %r{/home(/page/([\d]+))?} do |o, p|
+  session!
+
+  @activity = @cur_user.notifications.activities(:order => :id.desc).paginate({ :page => p, :per_page => 2})
+
+  haml :dashboard
+end
+
+get %r{/thread/([\d]+)(/page/([\d]+))?} do |id, o, p|
+  @conversation = Activity.all( :conditions => ["id = ? or parent_id = ?", id, id], :order => :id.asc ).paginate({ :page => p, :per_page => 20})
 
   haml :thread
 end

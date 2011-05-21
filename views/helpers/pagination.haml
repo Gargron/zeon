@@ -1,13 +1,20 @@
 %nav.pagination
   %ul
     %li
-      %a{ :href => "" }
+      %a{ :href => request.path_info.gsub(/\/page\/[\d]+/, '') }
         %span.arrow &laquo;
-    - 1.upto 5 do |i|
-      %li{ i == 3 ? { :class => "active" } : {} }
-        %a{ :href => "" }
-          %span.circle
-          %span.number= i
+    - @links.each do |i|
+      %li{i[:active] ? { :class => "active" } : {} }
+        - if i[:link] or i[:active]
+          - if i[:active]
+            %span.circle
+            %span.number= i[:text]
+          - else
+            %a{ :href => request.path_info.gsub(/page\/[\d]+/, '') + "page/" + i[:text].to_s }
+              %span.circle
+              %span.number= i[:text]
+        - else
+          = i[:text]
     %li
-      %a{ :href => "" }
+      %a{ :href => request.path_info.gsub(/page\/[\d]+/, '') + "page/" + @links.last[:text].to_s }
         %span.arrow &raquo;

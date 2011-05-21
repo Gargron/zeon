@@ -12,7 +12,7 @@ The 'federated' part means that users on a certain Zeon instance can communicate
 
 Those gems will get the ball rolling:
 
-    sudo gem install sinatra haml datamapper redis proudhon bcrypt yaml rspec sinatra-jsonp sinatra-session sinatra-flash sinatra-redirect-with-flash
+    sudo gem install sinatra haml will_paginate datamapper redis proudhon bcrypt yaml rspec sinatra-jsonp sinatra-session sinatra-flash sinatra-redirect-with-flash
 
 Redis is our cache server. For Push support we use Comet. We recomend Thin, Unicorn, Rainbows!, or Phusion Passengers as your Ruby app server.
 
