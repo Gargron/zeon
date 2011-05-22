@@ -63,6 +63,7 @@ GEM
     rack (1.2.2)
     rack-flash (0.1.1)
       rack
+    rdiscount (1.6.8)
     redis (2.2.0)
     rest-client (1.6.1)
       mime-types (>= 1.16)
@@ -103,6 +104,7 @@ DEPENDENCIES
   haml
   proudhon
   rack-flash
+  rdiscount
   redis
   rspec
   sinatra
