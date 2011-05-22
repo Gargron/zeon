@@ -78,6 +78,7 @@ describe 'Zeon' do
         :content => 'Heads up to @darkchaplain, since he\'ll like this new game. The #music is amazing. I\'m also cross-posting this on ~gamers.'
       )
     end
+    sleep 1
 
     it "should save" do
       @activity1.saved?.should == true
@@ -123,6 +124,7 @@ describe 'Zeon' do
           :type => :reply,
           :content => 'I **strongly** agree with you.'
         )
+        sleep 1
 
         @activity2_reply = Activity.create(
           :parent => @activity1,
@@ -130,6 +132,7 @@ describe 'Zeon' do
           :type => :reply,
           :content => 'Very very nice.'
         )
+        sleep 1
       end
 
       it "should trigger creator notifications" do

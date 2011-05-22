@@ -149,7 +149,7 @@ class Activity
     if REPLY.include? self.type
       old_meta = self.parent.meta
       new_meta = { :bumped_id => self.id, :bumped_by => self.user.name, :bumped_at => self.created_at }
-      new_meta['post_count'] = (old_meta['post_count'].to_i || 1) + 1
+      new_meta['post_count'] = (old_meta['post_count'] || 1) + 1
       self.parent.meta = old_meta.merge(new_meta)
       self.parent.updated_at = DateTime.now
       self.parent.save

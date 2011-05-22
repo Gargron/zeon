@@ -26,7 +26,8 @@
               %li
                 %a.like.boxed{ :href => "#" } Appreciate
               %li
-                0 readers
+                = activity.meta['post_count']
+                posts
               %li
                 Tagged:
                 - activity.tags.each do |tag|

@@ -18,10 +18,10 @@
           %li
             %span.likes
               = activity.meta['like_count']
-              readers
+              likes
             %span.posts
               = activity.meta['post_count']
-              replies
+              posts
           %li
             %a.last_reply{ :href =>  "/thread/" + activity.id.to_s }
               %span.what Last reply by
