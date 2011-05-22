@@ -147,8 +147,11 @@ class Activity
     end
     # Update parent's denormalization
     if REPLY.include? self.type
-      new_meta = { :post_count => self.parent.meta[:post_count] + 1, :bumped_id => self.id, :bumped_by => self.user.name, :bumped_at => self.created_at }
-      self.parent.meta.merge(new_meta)
+      old_meta = self.parent.meta
+      new_meta = { :bumped_id => self.id, :bumped_by => self.user.name, :bumped_at => self.created_at }
+      new_meta['post_count'] = (old_meta['post_count'].to_i || 1) + 1
+      self.parent.meta = old_meta.merge(new_meta)
+      self.parent.updated_at = DateTime.now
       self.parent.save
     end
     unless PRIVATE.include? self.type
@@ -275,8 +278,9 @@ get '/' do
   end
 end
 
-get %r{/all(/sort:([popular|latest|oldest|updated|posts]+))?(/page/([\d]+))?} do |o1, s, o2, p|
+get %r{/all(/sort:([popular|latest|oldest|updated]+))?(/page/([\d]+))?} do |o1, s, o2, p|
   sort = { :order => :id.desc }
+
   if s == "latest"
     sort = { :order => :id.desc }
   end
@@ -284,11 +288,9 @@ get %r{/all(/sort:([popular|latest|oldest|updated|posts]+))?(/page/([\d]+))?} do
     sort = { :order => :id.asc }
   end
   if s == "updated"
-    #sort = { :order => :meta.bumped_at.desc }
+    sort = { :order => :updated_at.desc }
   end
-  if s == "posts"
-    #sort = { :order => :meta.count.desc }
-  end
+
   @posts = Activity.public.all( sort ).paginate( :page => p, :per_page => 20 )
 
   haml :index

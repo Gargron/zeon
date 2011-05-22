@@ -16,12 +16,14 @@
               %span.name= activity.user.name
             %span.time= ago(activity.created_at)
           %li
-            %span.views 0 readers
+            %span.likes
+              = activity.meta['like_count']
+              readers
             %span.posts
-              = activity.children(:type => :reply).count
+              = activity.meta['post_count']
               replies
           %li
             %a.last_reply{ :href =>  "/thread/" + activity.id.to_s }
               %span.what Last reply by
-              %span.name= (activity.children(:type => :reply).last || activity).user.name
-              %span.time= ago((activity.children(:type => :reply).last || activity).created_at)
+              %span.name= activity.meta['bumped_by']
+              %span.time= ago(activity.meta['bumped_at'])
