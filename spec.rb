@@ -171,7 +171,7 @@ describe 'Zeon' do
 
   describe "activities from private users with mentions to someone else" do
     before :all do
-      @activity2 = Activity.create(
+      @activity3 = Activity.create(
         :user => @gargron,
         :type => :post,
         :title => 'Whoa what',
@@ -180,7 +180,7 @@ describe 'Zeon' do
     end
 
     it "should in fact relay mentions" do
-      @glassx.notifications.first(:activity => @activity2).kind.should == :mention
+      @glassx.notifications.first(:activity => @activity3).kind.should == :mention
     end
   end
 end

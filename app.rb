@@ -1,4 +1,5 @@
 require 'rubygems'
+require 'bundler/setup'
 require 'sinatra'
 require 'haml'
 require 'datamapper'
@@ -140,17 +141,16 @@ class Activity
   ## Callbacks
   after :create do
     # Denormalize
-    # DOES NOT WORK for some reason; please fix
-    #if NEW_CONTENT.include? self.type
-    #  self.meta = { :post_count => 1, :like_count => 0, :bumped_id => self.id, :bumped_by => self.user.name, :bumped_at => self.created_at }
-    #end
+    if NEW_CONTENT.include? self.type
+      self.meta = { :post_count => 1, :like_count => 0, :bumped_id => self.id, :bumped_by => self.user.name, :bumped_at => self.created_at }
+      self.save
+    end
     # Update parent's denormalization
-    # DOES NOT WORK for some reason; please fix
-    #if REPLY.include? self.type
-    #  new_meta = { :post_count => self.parent.meta[:post_count] + 1, :bumped_id => self.id, :bumped_by => self.user.name, :bumped_at => self.created_at }
-    #  self.parent.meta.merge(new_meta)
-    #  self.parent.save
-    #end
+    if REPLY.include? self.type
+      new_meta = { :post_count => self.parent.meta[:post_count] + 1, :bumped_id => self.id, :bumped_by => self.user.name, :bumped_at => self.created_at }
+      self.parent.meta.merge(new_meta)
+      self.parent.save
+    end
     unless PRIVATE.include? self.type
       mentions = User.all(:name => content.scan(MENTION))
       self.tags = content.scan(HASHTAG).flatten.map {|t| Tag.first(:name => t) || Tag.create(:name => t) }
@@ -170,7 +170,7 @@ class Activity
   end
 
   def self.public
-      all(:type.in => CONTENT, :parent_id => nil)
+      all(:type => CONTENT, :parent_id => nil)
   end
 
   def notify(kind, users)
