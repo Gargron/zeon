@@ -111,9 +111,9 @@ class Activity
     :video, :question, :event, :like, :bookmark, :vote, :tag,
     :attendance, :invitation, :poke, :recommendation, :message,
     :announcement, :follow, :unfollow ], :required => true, :index => true
-  property :title, String, :required => true
+  property :title, String
   property :content, Text
-  property :meta, Json
+  property :meta, Json, :default => {}
   property :updated_at, DateTime
   property :created_at, DateTime
 
@@ -125,10 +125,13 @@ class Activity
   has n, :notifications
   has n, :tags, :through => Resource, :constraint => :destroy
 
+  validates_presence_of :title, :if => lambda { |t| NEW_CONTENT.include? t.type }
+
   ## Constants
+  NEW_CONTENT = [ :post, :link, :video, :question, :event ]
   CONTENT = [ :post, :reply, :comment, :link, :image, :video, :question, :event ]
-  REPLY = [ :reply, :comment, :like, :vote, :tag, :attendance ]
-  SPECIFIC = [ :follow, :unfollow ]
+  REPLY = [ :reply, :comment ]
+  SPECIFIC = [ :follow, :unfollow, :like, :vote, :tag, :attendance ]
   PRIVATE = [ :bookmark, :vote, :invitation, :poke, :recommendation, :message ]
   MENTION = /@([a-z1-9]+)/i
   HASHTAG = /#([a-z1-9]+)/i
@@ -136,7 +139,19 @@ class Activity
 
   ## Callbacks
   after :create do
-    unless PRIVATE.include? type
+    # Denormalize
+    # DOES NOT WORK for some reason; please fix
+    #if NEW_CONTENT.include? self.type
+    #  self.meta = { :post_count => 1, :like_count => 0, :bumped_id => self.id, :bumped_by => self.user.name, :bumped_at => self.created_at }
+    #end
+    # Update parent's denormalization
+    # DOES NOT WORK for some reason; please fix
+    #if REPLY.include? self.type
+    #  new_meta = { :post_count => self.parent.meta[:post_count] + 1, :bumped_id => self.id, :bumped_by => self.user.name, :bumped_at => self.created_at }
+    #  self.parent.meta.merge(new_meta)
+    #  self.parent.save
+    #end
+    unless PRIVATE.include? self.type
       mentions = User.all(:name => content.scan(MENTION))
       self.tags = content.scan(HASHTAG).flatten.map {|t| Tag.first(:name => t) || Tag.create(:name => t) }
       self.group = Group.first(:name => content.scan(GROUPTAG))
@@ -186,7 +201,7 @@ end
 
 DataMapper.finalize
 
-if(config['migrate'] == 'true')
+if(config['migrate'])
   DataMapper.auto_migrate!
 else
   DataMapper.auto_upgrade!
@@ -260,10 +275,23 @@ get '/' do
   end
 end
 
-get %r{/all(/page/([\d]+))?} do |o, p|
-    @posts = Activity.public.all( :order => :id.desc ).paginate({ :page => p, :per_page => 20})
+get %r{/all(/sort:([popular|latest|oldest|updated|posts]+))?(/page/([\d]+))?} do |o1, s, o2, p|
+  sort = { :order => :id.desc }
+  if s == "latest"
+    sort = { :order => :id.desc }
+  end
+  if s == "oldest"
+    sort = { :order => :id.asc }
+  end
+  if s == "updated"
+    #sort = { :order => :meta.bumped_at.desc }
+  end
+  if s == "posts"
+    #sort = { :order => :meta.count.desc }
+  end
+  @posts = Activity.public.all( sort ).paginate( :page => p, :per_page => 20 )
 
-    haml :index
+  haml :index
 end
 
 get %r{/home(/page/([\d]+))?} do |o, p|

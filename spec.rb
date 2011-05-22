@@ -114,23 +114,20 @@ describe 'Zeon' do
         @bookmark = Activity.create(
           :parent => @activity1,
           :user => @keri,
-          :type => :bookmark,
-          :title => 'Bookmark'
+          :type => :bookmark
         )
 
         @activity1_reply = Activity.create(
           :parent => @activity1,
           :user => @gargron,
           :type => :reply,
-          :title => 'I like',
-          :content => 'I agree with you.'
+          :content => 'I **strongly** agree with you.'
         )
 
         @activity2_reply = Activity.create(
           :parent => @activity1,
           :user => @dc,
           :type => :reply,
-          :title => 'Same here',
           :content => 'Very very nice.'
         )
       end

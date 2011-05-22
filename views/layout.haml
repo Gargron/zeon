@@ -16,19 +16,23 @@
               %ul.subnav
                 - if session?
                   %li
-                    %a{ :href => "/" } Mentions
+                    %a{ :href => "/home" } Dashboard
+                  %li
+                    %a{ :href => "/home/inbox" } Inbox
                 %li
-                  %a{ :href => "/" } Popular
+                  %a{ :href => "/all" } All
+                %li
+                  %a{ :href => "/all/sort:popular" } Popular
             - if session?
               %li.subnav_wrap
-                %a{ :href => "/posts" } Posts &#9662;
+                %a{ :href => "/all" } Posts &#9662;
                 %ul.subnav
                   %li
-                    %a{ :href => "/" } New thread
+                    %a{ :href => "/create" } New thread
                   %li
-                    %a{ :href => "/" } My threads
+                    %a{ :href => "/all/creator:" + @cur_user.name } My threads
                   %li
-                    %a{ :href => "/" } Threads I posted in
+                    %a{ :href => "/all/poster:" + @cur_user.name } Threads I posted in
             %li
               %a{ :href => "/chat" } Chat
             - if !session?
