@@ -4,26 +4,27 @@
       - if activity.type == :post || activity.type == :like
         %li.item.item_freetext
           %div.item_meta
-            %a{ :href => "#" }
+            %a{ :href => "/user/" + activity.user.name }
               %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
               %span.name= activity.user.name
             - if activity.type == :post
               %span.verb posted
-              %a.object{ :href => "" } a thread
+              %a.object{ :href => "/thread/" + activity.id.to_s } a thread
             - if activity.type == :like
               %span.verb liked
-              %a.object{ :href => "" }
+              %a.object{ :href => "/thread/" + activity.parent.id.to_s }
                 = activity.parent.user.name + "'s"
                 thread
             %span.time= ago(activity.created_at)
-          %div.item_content
+          %div.item_content.format
             %h2
               %a{ :href => "/thread/" + activity.id.to_s }= activity.title
-            %p= activity.content
+            :markdown
+              #{activity.content}
           %div.item_utils
             %ul
               %li
-                %a.like.boxed{ :href => "" } Appreciate
+                %a.like.boxed{ :href => "#" } Appreciate
               %li
                 0 readers
               %li
@@ -33,17 +34,18 @@
       - if activity.type == :reply || activity.type == :comment
         %li.item.item_indirect
           %div.item_meta
-            %a{ :href => "#" }
+            %a{ :href => "/user/" + activity.user.name }
               %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
               %span.name= activity.user.name
             %span.verb replied to
-            %a.object{ :href => "" }
+            %a.object{ :href => "/thread/" + activity.parent.id.to_s }
               = activity.parent.user.name + "'s"
               thread
             %span.time= ago(activity.created_at)
           %div.item_content
-            %blockquote.item_reply
-              = activity.content
+            %blockquote.item_reply.format
+              :markdown
+                #{activity.content}
           %div.item_utils
             %ul
               %li
@@ -51,7 +53,7 @@
       - if activity.type == :image
         %li.item.item_image
           %div.item_meta
-            %a{ :href => "#" }
+            %a{ :href => "/user/" + activity.user.name }
               %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
               %span.name= activity.user.name
             %span.verb uploaded
@@ -69,13 +71,15 @@
                 %dd 1456x757
               %dl
                 %dt Source:
-                %dd http://pixiv.net/&#0133;?id=12345
-            %blockquote.item_image_comment
-              = activity.content
+                %dd
+                  %a{ :href => "#" } http://pixiv.net/&#0133;?id=12345
+            %blockquote.item_image_comment.format
+              :markdown
+                #{activity.content}
           %div.item_utils
             %ul
               %li
-                %a.like.boxed{ :href => "" } Appreciate
+                %a.like.boxed{ :href => "#" } Appreciate
               %li
                 0 viewers
               %li

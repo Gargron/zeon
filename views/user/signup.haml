@@ -4,6 +4,8 @@
       Sign up
     %ol
       %li
+        = haml :"helpers/error"
+      %li
         %label.block{ :for => 'name' } Desired username:
         %input#name.extra_large{ :type => 'text', :name => 'name', :value => params[:name], :placeholder => "[A-Za-z0-9_-]{1-30}" }
       %li

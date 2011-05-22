@@ -192,6 +192,8 @@ ul.breadcrumb
     padding: 10px 34px
     margin-right: 1px
     position: relative
+    a
+      text-decoration: none
     span.number
       display: inline-block
       background: #6c8498
@@ -200,6 +202,10 @@ ul.breadcrumb
       border-radius: 3px
       border-bottom-color: #bcc7d0
       border-right-color: #bcc7d0
+    &.active
+      background: #555
+      &:after
+        border-color: transparent transparent transparent #555
     &:before
       display: block
       content: ' '
@@ -229,6 +235,22 @@ ul.breadcrumb
     &:first-child
       padding-left: 20px
       border-top-left-radius: 10px
+
+div.message
+  background: rgba(40, 40, 40, 0.4)
+  border: 1px solid #000
+  border-left: 0
+  border-right: 0
+  padding: 5px 0
+  text-align: center
+  font-weight: bold
+  font-size: 13px
+  &.error
+    background: rgba(231, 47, 38, 0.4)
+    color: #f39591
+  &.success
+    background: rgba(17, 32, 17, 0.4)
+    color: #7ca27c
 
 nav.pagination
   display: block

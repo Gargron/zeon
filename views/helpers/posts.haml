@@ -11,17 +11,17 @@
       %div.item_meta
         %ul
           %li
-            %a{ :href => "" }
+            %a{ :href => "/user/" + activity.user.name }
               %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
               %span.name= activity.user.name
             %span.time= ago(activity.created_at)
           %li
             %span.views 0 readers
             %span.posts
-              = activity.children.count
+              = activity.children(:type => :reply).count
               replies
           %li
-            %a.last_reply{ :href => "" }
+            %a.last_reply{ :href =>  "/thread/" + activity.id.to_s }
               %span.what Last reply by
-              %span.name User2
-              %span.time 0 minutes ago
+              %span.name= (activity.children(:type => :reply).last || activity).user.name
+              %span.time= ago((activity.children(:type => :reply).last || activity).created_at)

@@ -4,6 +4,8 @@
       Sign in
     %ol
       %li
+        = haml :"helpers/error"
+      %li
         %label.block{ :for => 'name' } Username:
         %input#name.extra_large{ :type => 'text', :name => 'name', :value => params[:name] }
       %li

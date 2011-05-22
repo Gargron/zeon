@@ -8,7 +8,15 @@
             %span.name= activity.user.name
           %span.id= "#" + activity.id.to_s
           %span.time= ago(activity.created_at)
-        %div.item_content
+        %div.item_content.format
           - if activity.type == :post
-            %h2= activity.title
-          = activity.content
+            %h1= activity.title
+          :markdown
+            #{activity.content}
+        - if activity.type == :post
+          %div.item_utils
+            %ul
+              %li
+                Tagged:
+                - activity.tags.each do |tag|
+                  %a.boxed{ :href => "/tag/" + tag.name }= tag.name

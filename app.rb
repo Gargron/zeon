@@ -25,7 +25,7 @@ class User
   include DataMapper::Resource
 
   property :id, Serial
-  property :name, String, :required => true, :unique => true, :index => true, :length => 4..20, :format => /^\w+$/i
+  property :name, String, :required => true, :unique => true, :index => true, :length => 1..30, :format => /^\w+$/i
   property :password, BCryptHash, :required => true, :length => 6..200
   property :email, String, :required => true, :unique => true, :format => :email_address
   property :status, Enum[ :active, :remote, :administrator, :inactive, :deleted ], :required => true, :default => :active
