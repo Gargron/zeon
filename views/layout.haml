@@ -3,7 +3,6 @@
   %head
     %meta{ :charset => "utf-8" }/
     %title= settings.site_title
-    %link{ :href => 'http://fonts.googleapis.com/css?family=Arvo', :rel => 'stylesheet', :type => 'text/css' }
     %link{ :href => 'http://fonts.googleapis.com/css?family=Lobster', :rel => 'stylesheet', :type => 'text/css' }
     %link{ :rel => "stylesheet", :href => "/style/style.css", :type => "text/css" }/
   %body{ :lang => "en" }
@@ -53,17 +52,24 @@
         %div#container
           = yield
         %aside#sidebar
-          %div.widget.important
-            %h4
-              %a.close{ :href => "javascript:;" } &#215;
-              Update
-            %p Hello, this is an update. It is awesome, I daresay; also commas are not that important. But it doesn't really matter, I just need placeholder text.
+          - if session?
+            %div.widget.important
+              %h4
+                %a.close{ :href => "javascript:;" } &#215;
+                Update
+              %p Hello, this is an update. It is awesome, I daresay; also commas are not that important. But it doesn't really matter, I just need placeholder text.
           %div.widget
             %h4 Advertising
             %p.half_text_ad
               %img{ :src => "http://placehold.it/200/000/555", :width => "200", :height => "200" }
               Here comes the text,
               %a{ :href => "#" } visit it!
+          %div.widget
+            %h4 Network
+            %p.half_text_ad
+              %img{ :src => "http://i.imgur.com/ZsQt9.png", :width => "250", :height => "50", :alt => "Colorcast - The Colorless Podcast" }
+              %a{ :href => "http://podcast.thecolorless.net" } Susbcribe
+              to our audio podcast!
       %footer#footer
         %nav
           %ul
@@ -86,5 +92,6 @@
     :javascript
       !window.jQuery && document.write(unescape('%3Cscript src="js/jquery.min.js"%3E%3C/script%3E'))
     %script{ :src => "/js/plugins/jquery.showpassword.min.js" }
-    %script{ :src => "/js/plugins/jquery.tipsy.js" }
+    %script{ :src => "/js/plugins/jquery.tipTip.minified.js" }
+    %script{ :src => "/js/plugins/waypoints.min.js" }
     %script{ :src => "/js/colorless.js" }

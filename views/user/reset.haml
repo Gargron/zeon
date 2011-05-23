@@ -1,4 +1,12 @@
 %form{ :action => '/reset', :method => 'post' }
-  %label{ :for => 'email' } E-mail:
-  %input{ :name => 'email', :type => 'text', :placeholder => 'E-mail', :value => params[:email] }
-  %button{ :type => 'signup' } Reset
+  %fieldset
+    %legend Reset password
+    %ol
+      %li
+        = haml :"helpers/error"
+      %li
+        %label.block{ :for => 'email' } E-mail:
+        %input#email.extra_large{ :name => 'email', :type => 'text', :value => params[:email] }
+      %li
+        %button{ :type => 'signup' } Reset password
+        %em.pretty_italic &mdash; Your new password will be e-mailed to your e-mail address

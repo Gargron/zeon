@@ -1,0 +1,35 @@
+%form#create{ :method => 'post', :action => '/activity' }
+  %fieldset
+    %legend
+      Create new post
+    %ol
+      %li.choose_type
+        %div.container
+          %a.freetext.active{ :href => "#", :data => { :value => "post" } } Freetext
+          %a.image{ :href => "#", :data => { :value => "image" } } Image
+          %a.video{ :href => "#", :data => { :value => "video" } } Video
+          %a.link{ :href => "#", :data => { :value => "link" } } Link
+        %input#type{ :type => "hidden", :name => "type", :value => "post" }
+      %li.title.active
+        %label.block{ :for => "title" } Title:
+        %input#title.extra_large{ :type => "text", :name => "title" }
+        %div.box.info
+          Please make your title as descriptive as possible
+      %li.file.inactive
+        %label.block{ :for => "file" } File:
+        %input#file{ :type => "file", :name => "file" }
+        %div.box.info
+          Only JPG, PNG or GIF files of up to 5 MB
+      %li.url.inactive
+        %label.block{ :for => "url" } URL:
+        %input#url.extra_large{ :type => "url", :name => "url" }
+        %div.box.info
+          Note: If posting an image, input the artist's URL here. If it's a video, it should be the address of the video.
+      %li.text.active
+        %label.block{ :for => "text" } Text:
+        %textarea#text{ :name => "text" }
+      %li.tags
+        %label.block{ :for => "tags" } Space-separated tags:
+        %textarea#tags{ :name => "tags" }
+      %li
+        %button{ :type => "submit" } Create new post

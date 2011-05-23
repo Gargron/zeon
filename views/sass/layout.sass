@@ -236,6 +236,10 @@ ul.breadcrumb
       padding-left: 20px
       border-top-left-radius: 10px
 
+div.container
+  overflow: hidden
+  *zoom: 1
+
 div.message
   background: rgba(40, 40, 40, 0.4)
   border: 1px solid #000
@@ -251,6 +255,20 @@ div.message
   &.success
     background: rgba(17, 32, 17, 0.4)
     color: #7ca27c
+
+.ribbony_thing
+  position: relative
+  left: -20px
+  border-top-right-radius: 10px
+  border-bottom-right-radius: 10px
+  border: 1px solid #000
+  border-left-color: #222
+  border-bottom-color: #333
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2)
+  width: 610px
+  margin-bottom: 1.5em
+  background: #111
+  padding: 20px
 
 nav.pagination
   display: block
@@ -290,36 +308,13 @@ nav.pagination
           background-color: #88c6e0
           box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3), 0 0 3px rgba(136, 198, 224, 0.25)
 
-.tipsy
-  padding: 3px
-  font-size: 11px
-  opacity: 0.8
-  filter: alpha(opacity=80)
-  background-repeat: no-repeat
-  padding: 5px
-  &:after
-    display: block
-    content: ' '
-    position: absolute
-    border-color: transparent transparent transparent #000
-    border-style: solid
-    border-width: 5px
-    width: 0
-    height: 0
-    left: 50%
-    top: 0
-  .tipsy-inner
-    padding: 2px 5px
-    background-color: black
-    color: white
-    max-width: 200px
-    text-align: center
-    border-radius: 3px
+@import tiptip
 
 a.boxed
   padding: 0 6px
   border-radius: 3px
   background: #0d0d0d
+  margin-bottom: 3px
   text-decoration: none
   display: inline-block
   &:hover

@@ -4,5 +4,37 @@
   %li.active
     = @conversation.first.title
 
-= haml :"helpers/conversation"
+%div.ribbony_thing
+  = haml :"helpers/conversation"
 = will_paginate @conversation
+
+%div.ribbony_thing
+  %form.notabox{ :action => "/activity/" + @item.id.to_s + "/reply", :method => "post" }
+    %fieldset
+      %ol
+        %li
+          %label.block{ :for => "content" } Reply:
+          %textarea#content{ :name => "content" }
+          %div.info
+            %code *italics*
+            %code **bold**
+            %code `code`
+            %code [Text](http://url.com)
+            %code ![](http://image_url.com)
+        - if !session?
+          %li
+            %div.columns_2
+              %section
+                %h5 Existing user
+                %input.tt_form{ :type => "text", :placeholder => "Username", :name => "username", :data => { :tooltip => "Your username" } }
+                %input.tt_form{ :type => "password", :name => "password", :data => { :tooltip => "Your password" } }
+              %section
+                %h5 New user
+                %input.tt_form{ :type => "text", :placeholder => "Username", :name => "new_username", :data => { :tooltip => "Your new username from 1-30 characters. Only these characters allowed: a-z A-Z 0-9 _ -" } }
+                %input.tt_form{ :type => "email", :placeholder => "Valid e-mail", :name => "new_email", :data => { :tooltip => "Your valid e-mail address. Don't worry, we hate spam" } }
+                %input.tt_form{ :type => "password", :name => "password", :data => { :tooltip => "Your new password. Check it twice!" } }
+
+        %li
+          %button{ :type => "submit" } Post reply
+          - if !session?
+            %em.pretty_italic &mdash; You are currently not signed in

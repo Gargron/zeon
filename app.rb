@@ -30,7 +30,7 @@ class User
   property :password, BCryptHash, :required => true, :length => 6..200
   property :email, String, :required => true, :unique => true, :format => :email_address
   property :status, Enum[ :active, :remote, :administrator, :inactive, :deleted ], :required => true, :default => :active
-  property :blob, Json
+  property :blob, Json, :default => {}
   property :private_key, Text
   property :public_key, Text
   property :updated_at, DateTime
@@ -305,9 +305,18 @@ get %r{/home(/page/([\d]+))?} do |o, p|
 end
 
 get %r{/thread/([\d]+)(/page/([\d]+))?} do |id, o, p|
+  @item = Activity.first( :id => id, :parent_id => nil )
+  if @item.nil?
+    halt 404
+  end
   @conversation = Activity.all( :conditions => ["id = ? or parent_id = ?", id, id], :order => :id.asc ).paginate({ :page => p, :per_page => 20})
-
   haml :thread
+end
+
+get '/create' do
+  session!
+
+  haml :create
 end
 
 get '/style/style.css' do
@@ -431,25 +440,18 @@ get '/reset' do
 end
 
 post '/reset' do
-  halt 303, {:error => 'You\'re already logged on.'} if session?
-
-  if user = User.first(:email => params[:email])
-    puts user.password = (rand(2**32) + 2**32).to_s(36)
-    user.save
-  end
-
-  {:success => "If you're registered with us, your new password was just sent to your e-mail."}.to_json
-end
-
-post '/reset' do
   redirect '/' if session?
 
+  if params[:email].length < 1
+    redirect '/reset', :error => "E-mail must not be blank"
+  end
+
   if user = User.first(:email => params[:email])
     puts user.password = (rand(2**32) + 2**32).to_s(36)
     user.save
   end
 
-  redirect '/', :success => "If you're registered with us, your new password was just sent to your e-mail."
+  redirect '/reset', :success => "If you're registered with us, your new password was just sent to your e-mail."
 end
 
 get '/profile' do

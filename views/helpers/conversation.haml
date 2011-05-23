@@ -1,22 +1,28 @@
 %ul.conversation
   - @conversation.each do |activity|
     - if activity.type == :post || activity.type == :reply
+      - if activity.type == :post
+        %li.item_first
+          %h1= activity.title
+          %div.item_utils
+            %ul
+              %li
+                0 likes &bull;
+                %a.boxed{ :href => "#" } Appreciate
+              %li
+                = activity.meta['post_count']
+                posts
+              %li
+                Tagged:
+                - activity.tags.each do |tag|
+                  %a.boxed{ :href => "/tag/" + tag.name }= tag.name
       %li.item
         %div.item_meta
-          %a.author{ :href => "" }
+          %a.author.tt{ :href => "", :title => (activity.user.blob['real_name'] || nil) }
             %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
             %span.name= activity.user.name
           %span.id= "#" + activity.id.to_s
           %span.time= ago(activity.created_at)
         %div.item_content.format
-          - if activity.type == :post
-            %h1= activity.title
           :markdown
             #{activity.content}
-        - if activity.type == :post
-          %div.item_utils
-            %ul
-              %li
-                Tagged:
-                - activity.tags.each do |tag|
-                  %a.boxed{ :href => "/tag/" + tag.name }= tag.name

@@ -1,6 +1,8 @@
 %ul.breadcrumb
   %li
-    Frontpage
+    %a{ :href => "/" } Frontpage
+  %li.active
+    All
 
 = haml :"helpers/posts"
 = will_paginate @posts
