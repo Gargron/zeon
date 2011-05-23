@@ -2,7 +2,7 @@
   - if session?
     - @activity.each do |activity|
       - if activity.type == :post || activity.type == :like
-        %li.item.item_freetext
+        %li.item.item_freetext{ :id => "a" + activity.id.to_s }
           %div.item_meta
             %a{ :href => "/user/" + activity.user.name }
               %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
@@ -33,7 +33,7 @@
                 - activity.tags.each do |tag|
                   %a.boxed{ :href => "/tag/" + tag.name }= tag.name
       - if activity.type == :reply || activity.type == :comment
-        %li.item.item_indirect
+        %li.item.item_indirect{ :id => "a" + activity.id.to_s }
           %div.item_meta
             %a{ :href => "/user/" + activity.user.name }
               %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
@@ -52,7 +52,7 @@
               %li
                 %a.boxed{ :href => "/thread/" + activity.parent.id.to_s } View in context
       - if activity.type == :image
-        %li.item.item_image
+        %li.item.item_image{ :id => "a" + activity.id.to_s }
           %div.item_meta
             %a{ :href => "/user/" + activity.user.name }
               %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }

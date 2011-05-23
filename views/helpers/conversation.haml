@@ -16,12 +16,13 @@
                 Tagged:
                 - activity.tags.each do |tag|
                   %a.boxed{ :href => "/tag/" + tag.name }= tag.name
-      %li.item
+      %li.item{ :id => "p" + activity.id.to_s }
         %div.item_meta
-          %a.author.tt{ :href => "", :title => (activity.user.blob['real_name'] || nil) }
+          %a.author.tt{ :href => "/user/" + activity.user.name, :title => (activity.user.blob['real_name'] || nil) }
             %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
             %span.name= activity.user.name
-          %span.id= "#" + activity.id.to_s
+          %span.id
+            %a{ :href => "/thread/" + @item.id.to_s + "#p" + activity.id.to_s }= "#" + activity.id.to_s
           %span.time= ago(activity.created_at)
         %div.item_content.format
           :markdown

@@ -9,9 +9,10 @@
 = will_paginate @conversation
 
 %div.ribbony_thing
-  %form.notabox{ :action => "/activity/" + @item.id.to_s + "/reply", :method => "post" }
+  %form#reply.notabox{ :action => "/activity/" + @item.id.to_s + "/reply", :method => "post" }
     %fieldset
       %ol
+        %li= haml :"helpers/error"
         %li
           %label.block{ :for => "content" } Reply:
           %textarea#content{ :name => "content" }
@@ -32,7 +33,7 @@
                 %h5 New user
                 %input.tt_form{ :type => "text", :placeholder => "Username", :name => "new_username", :data => { :tooltip => "Your new username from 1-30 characters. Only these characters allowed: a-z A-Z 0-9 _ -" } }
                 %input.tt_form{ :type => "email", :placeholder => "Valid e-mail", :name => "new_email", :data => { :tooltip => "Your valid e-mail address. Don't worry, we hate spam" } }
-                %input.tt_form{ :type => "password", :name => "password", :data => { :tooltip => "Your new password. Check it twice!" } }
+                %input.tt_form{ :type => "password", :name => "new_password", :data => { :tooltip => "Your new password. Check it twice!" } }
 
         %li
           %button{ :type => "submit" } Post reply

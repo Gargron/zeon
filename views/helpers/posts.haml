@@ -1,6 +1,6 @@
 %ul.posts
   - @posts.each do |activity|
-    %li.item
+    %li.item{ :id => "a" + activity.id.to_s }
       %div.item_content
         %h2
           %a{ :href => "/thread/" + activity.id.to_s }= activity.title

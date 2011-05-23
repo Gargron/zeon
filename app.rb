@@ -344,6 +344,37 @@ post '/activity/:id/delete' do |id|
 end
 
 post '/activity/:id/:action' do |id,action|
+  if !session?
+    if !params[:username].empty? and !params[:password].empty?
+      if user = User.first(:name => params[:username], :status => [:active, :administrator]) and user.password == params[:password]
+        session_start!
+        session[:id], session[:name], session[:email] = user.id, user.name, user.email
+        do_it = true
+      else
+        redirect '/thread/' + id.to_s + "#reply", :error => "Your username or password or both are wrong"
+      end
+    elsif !params[:new_username].empty? and !params[:new_email].empty? and !params[:new_password].empty?
+      if user = User.create(:name => params[:new_username], :password => params[:new_password], :email => params[:new_email]) and user.saved?
+        session_start!
+        session[:id], session[:name], session[:email] = user.id, user.name, user.email
+        do_it = true
+      else
+        redirect '/thread/' + id.to_s + "#reply", :error => user.errors.to_a.join(' - ')
+      end
+    else
+      redirect '/thread/' + id.to_s + "#reply", :error => "Not signed in at all, please either input login or registration data"
+    end
+  end
+  if action == "reply"
+    if session? or do_it
+      user = User.first(:id => session[:id])
+      parent = Activity.first( :id => id, :parent_id => nil )
+      halt 404 unless parent
+      if reply = Activity.create( :parent_id => id, :user => user, :type => :reply, :content => params[:content])
+        redirect '/thread/' + id.to_s + "#p" + reply.id.to_s
+      end
+    end
+  end
   # Reply
   # Like
   # Tag
