@@ -147,10 +147,8 @@ class Activity
     end
     # Update parent's denormalization
     if REPLY.include? self.type
-      old_meta = self.parent.meta
-      new_meta = { :bumped_id => self.id, :bumped_by => self.user.name, :bumped_at => self.created_at }
-      new_meta['post_count'] = (old_meta['post_count'] || 1) + 1
-      self.parent.meta = old_meta.merge(new_meta)
+      old_meta = self.parent.meta.to_hash
+      self.parent.meta = { :post_count => (old_meta[:post_count] || 1) + 1, :like_count => (old_meta[:like_count] || 0), :bumped_id => self.id, :bumped_by => self.user.name, :bumped_at => DateTime.now }
       self.parent.updated_at = DateTime.now
       self.parent.save
     end
@@ -267,6 +265,16 @@ helpers do
       "#{(diff/r.first).ceil} #{n}#{'s' if (diff/r.first).ceil > 1} ago" if r.include? diff
     end.join
   end
+
+  def goto(parent_id, post_id, per_page)
+    count = Activity.first(:id => parent_id).children(:type => :reply, :id.lt => post_id).count
+    page  = (count / per_page).floor + 1
+    if page == 1
+      "/thread/" + parent_id.to_s + "#p" + post_id.to_s
+    else
+      "/thread/" + parent_id.to_s + "/page/" + page.to_s + "#p" + post_id.to_s
+    end
+  end
 end
 
 ## Controllers
@@ -371,7 +379,7 @@ post '/activity/:id/:action' do |id,action|
       parent = Activity.first( :id => id, :parent_id => nil )
       halt 404 unless parent
       if reply = Activity.create( :parent_id => id, :user => user, :type => :reply, :content => params[:content])
-        redirect '/thread/' + id.to_s + "#p" + reply.id.to_s
+        redirect goto(id, reply.id, 20)
       end
     end
   end

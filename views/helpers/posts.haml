@@ -23,7 +23,7 @@
               = activity.meta['post_count']
               posts
           %li
-            %a.last_reply{ :href =>  "/thread/" + activity.id.to_s }
+            %a.last_reply{ :href =>  goto(activity.id, activity.meta['bumped_id'], 20) }
               %span.what Last reply by
               %span.name= activity.meta['bumped_by']
               %span.time= ago(activity.meta['bumped_at'])
