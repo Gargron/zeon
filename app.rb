@@ -332,6 +332,15 @@ helpers do
     end
     "%.#{precision}f#{suffix}" % value
   end
+
+  def megapixels(string)
+    dimensions = string.split("x")
+    width  = dimensions[0]
+    height = dimensions[1]
+    mp     = (width.to_f * height.to_f) / 1000000.0
+    mp     = (mp * 10).round / 10.0
+    mp
+  end
 end
 
 ## Controllers

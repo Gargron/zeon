@@ -29,5 +29,30 @@
             #{activity.content}
     - if activity.type == :image
       %li.item_image
-        %a{ :href => activity.image.url }
+        %a.framed_image_holder.fih_600{ :href => activity.image.url }
           %img.framed_image{ :src => activity.image.url(:medium) }
+        %ul.item_utils
+          %li
+            %div.item_image_info
+              %dl
+                %dt Posted at:
+                %dd= ago(activity.created_at)
+              %dl
+                %dt Posted by:
+                %dd
+                  %a.author.tt{ :href => "/user/" + activity.user.name, :title => (activity.user.blob['real_name'] || nil) }= activity.user.name
+              %dl
+                %dt Likes:
+                %dd= activity.meta["like_count"]
+              %dl
+                %dt Size:
+                %dd= make_bytes(activity.image.size)
+              %dl
+                %dt Dimensions:
+                %dd= activity.image_dimensions + " (" + megapixels(activity.image_dimensions).to_s + " MP)"
+          %li.item_content.format
+            :markdown
+              #{activity.content}
+        %div.item_tags
+          - activity.tags.each do |tag|
+            %a.boxed{ :href => "/tag/" + tag.name }= tag.name
