@@ -14,3 +14,12 @@ task :console do
   ARGV.clear
   IRB.start
 end
+
+task :reprocess do
+  require 'app'
+  Activity.each do |b|
+    if b.image?
+      b.image.reprocess!
+    end
+  end
+end

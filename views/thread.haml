@@ -1,8 +1,14 @@
 %ul.breadcrumb
   %li
     %a{ :href => "/" } Frontpage
-  %li.active
-    = @conversation.first.title
+  - if @item.type == :image
+    %li
+      %a{ :href => "/all/type:image" } Images
+    %li.active
+      = "#" + @item.id.to_s
+  - if [:post, :link, :video, :question, :event].include? @item.type
+    %li.active
+      = @item.title
 
 %div.ribbony_thing
   = haml :"helpers/conversation"

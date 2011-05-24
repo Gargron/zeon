@@ -240,12 +240,25 @@ div.container
   overflow: hidden
   *zoom: 1
 
+a.framed_image_holder
+  display: block
+  &.fih_200x150
+    width: 214px
+    height: 164px
+
+img.framed_image
+  display: block
+  margin: 0 auto
+  padding: 6px
+  background: #333
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.4)
+
 div.message
   background: rgba(40, 40, 40, 0.4)
   border: 1px solid #000
   border-left: 0
   border-right: 0
-  padding: 5px 0
+  padding: 5px
   text-align: center
   font-weight: bold
   font-size: 13px

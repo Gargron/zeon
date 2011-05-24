@@ -1,6 +1,6 @@
-%form#create{ :method => 'post', :action => '/activity' }
+%form#create{ :method => 'post', :action => '/activity', :enctype => "multipart/form-data" }
   %fieldset
-    %legend
+    %legend.no_border
       Create new post
     %ol
       %li.choose_type
@@ -10,26 +10,31 @@
           %a.video{ :href => "#", :data => { :value => "video" } } Video
           %a.link{ :href => "#", :data => { :value => "link" } } Link
         %input#type{ :type => "hidden", :name => "type", :value => "post" }
+      %li
+        = haml :"helpers/error"
       %li.title.active
-        %label.block{ :for => "title" } Title:
+        %label.block{ :for => "title" }
+          Title &bull;
+          %em.pretty_italic Please make your title as descriptive as possible
         %input#title.extra_large{ :type => "text", :name => "title" }
-        %div.box.info
-          Please make your title as descriptive as possible
       %li.file.inactive
-        %label.block{ :for => "file" } File:
-        %input#file{ :type => "file", :name => "file" }
-        %div.box.info
-          Only JPG, PNG or GIF files of up to 5 MB
+        %label.block{ :for => "file" }
+          File &bull;
+          %em.pretty_italic Only JPG, PNG or GIF files of up to 5 MB
+        %input#file{ :type => "file", :name => "image_file" }
       %li.url.inactive
         %label.block{ :for => "url" } URL:
         %input#url.extra_large{ :type => "url", :name => "url" }
-        %div.box.info
-          Note: If posting an image, input the artist's URL here. If it's a video, it should be the address of the video.
       %li.text.active
-        %label.block{ :for => "text" } Text:
+        %label.block{ :for => "text" }
+          Text &bull;
+          %em.pretty_italic Markdown enabled
         %textarea#text{ :name => "text" }
       %li.tags
-        %label.block{ :for => "tags" } Space-separated tags:
+        %label.block{ :for => "tags" }
+          Tags &bull;
+          %em.pretty_italic Space-separated
         %textarea#tags{ :name => "tags" }
       %li
         %button{ :type => "submit" } Create new post
+        %em.pretty_italic &mdash; By posting you agree to our rules and terms of service

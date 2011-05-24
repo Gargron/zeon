@@ -8,18 +8,27 @@ require 'redis'
 require 'proudhon'
 
 require 'yaml'
+require 'fileutils'
 
 require 'sinatra/jsonp'
 require 'sinatra/session'
 require 'sinatra/flash'
 require 'sinatra/redirect_with_flash'
 require 'will_paginate'
+require 'dm-paperclip'
+require 'dm-paperclip/geometry'
 
 config = YAML.load_file('config.yml')
 
 set :site_title, config['site_title']
 set :show_exceptions, TRUE
 DataMapper.setup(:default, config['mysql'])
+
+Paperclip.configure do |conf|
+  conf.root               = Dir.pwd
+  conf.env                = 'development'
+  conf.use_dm_validations = true
+end
 
 ## Models
 class User
@@ -106,6 +115,8 @@ end
 
 class Activity
   include DataMapper::Resource
+  include DataMapper::Validate
+  include Paperclip::Resource
 
   property :id, Serial
   property :type, Enum[ :post, :reply, :comment, :link, :image,
@@ -126,10 +137,22 @@ class Activity
   has n, :notifications
   has n, :tags, :through => Resource, :constraint => :destroy
 
-  validates_presence_of :title, :if => lambda { |t| NEW_CONTENT.include? t.type }
+  has_attached_file :image,
+                    :path => Dir.pwd + '/public/uploads/:attachment/:id/:style/:filename',
+                    :url => '/uploads/:attachment/:id/:style/:filename',
+                    :styles => { :thumb_all => '200x150>', :thumb_dash => '220x240>', :medium => '600x1000>' }
+
+  property :image_dimensions, String
+
+  validates_presence_of :title, :if => lambda { |t| REQ_TITLE.include? t.type }
+
+  validates_attachment_presence :image, :if => lambda { |t| t.type == :image }
+  validates_attachment_content_type :image, :content_type => [ "image/png", "image/jpg", "image/jpeg", "image/gif" ]
+  validates_attachment_size :image, :in => 1..5242880
 
   ## Constants
-  NEW_CONTENT = [ :post, :link, :video, :question, :event ]
+  REQ_TITLE = [ :post, :link, :video, :question, :event ]
+  NEW_CONTENT = [ :post, :image, :link, :video, :question, :event ]
   CONTENT = [ :post, :reply, :comment, :link, :image, :video, :question, :event ]
   REPLY = [ :reply, :comment ]
   SPECIFIC = [ :follow, :unfollow, :like, :vote, :tag, :attendance ]
@@ -147,8 +170,7 @@ class Activity
     end
     # Update parent's denormalization
     if REPLY.include? self.type
-      old_meta = self.parent.meta.to_hash
-      self.parent.meta = { :post_count => (old_meta[:post_count] || 1) + 1, :like_count => (old_meta[:like_count] || 0), :bumped_id => self.id, :bumped_by => self.user.name, :bumped_at => DateTime.now }
+      self.parent.meta = parent.meta.merge( "post_count" => parent.meta.fetch("post_count", 1) + 1, "bumped_id" => self.id, "bumped_by" => self.user.name, "bumped_at" => DateTime.now )
       self.parent.updated_at = DateTime.now
       self.parent.save
     end
@@ -171,7 +193,7 @@ class Activity
   end
 
   def self.public
-      all(:type => CONTENT, :parent_id => nil)
+      all(:type => NEW_CONTENT, :parent_id => nil)
   end
 
   def notify(kind, users)
@@ -275,6 +297,41 @@ helpers do
       "/thread/" + parent_id.to_s + "/page/" + page.to_s + "#p" + post_id.to_s
     end
   end
+
+  def paper_mash(file_hash)
+    mash = Hash.new
+    mash['tempfile'] = file_hash[:tempfile]
+    mash['filename'] = file_hash[:filename]
+    mash['content_type'] = file_hash[:type]
+    mash['size'] = file_hash[:tempfile].size
+    mash
+  end
+
+  def make_bytes(bytes, max_digits=3)
+    k = 2.0**10
+    m = 2.0**20
+    g = 2.0**30
+    t = 2.0**40
+    value, suffix, precision = case bytes
+      when 0...k
+        [ bytes, 'b', 0 ]
+      else
+        value, suffix = case bytes
+          when k...m : [ bytes / k, 'kB' ]
+          when m...g : [ bytes / m, 'MB' ]
+          when g...t : [ bytes / g, 'GB' ]
+          else         [ bytes / t, 'TB' ]
+        end
+        used_digits = case value
+          when   0...10   : 1
+          when  10...100  : 2
+          when 100...1000 : 3
+        end
+        leftover_digits = max_digits - used_digits
+        [ value, suffix, leftover_digits > 0 ? leftover_digits : 0 ]
+    end
+    "%.#{precision}f#{suffix}" % value
+  end
 end
 
 ## Controllers
@@ -340,7 +397,43 @@ end
 
 ## Content Interaction
 post '/activity' do
+  session!
   # Create Activity
+  type = params[:type]
+
+  case type
+  when "post"
+    if !params[:title].empty? and !params[:text].empty?
+      if freetext = Activity.create( :title => params[:title], :type => :post, :content => params[:text], :user => @cur_user ) and freetext.saved?
+        redirect '/thread/' + freetext.id.to_s
+      else
+        redirect '/create', :error => freetext.errors.to_a.join(' - ')
+      end
+    else
+      redirect '/create', :error => "A freetext post requires a title and the text itself!"
+    end
+  when "image"
+    unless params[:image_file]
+      redirect '/create', :error => "An image post requires an actual file to be uploaded!"
+    end
+    # Create image
+    dimensions = Paperclip::Geometry.from_file(params[:image_file][:tempfile])
+    if image = Activity.create( :type => :image, :user => @cur_user, :content => params[:text], :image => paper_mash(params[:image_file]), :image_dimensions => dimensions.width.round.to_s + "x" + dimensions.height.round.to_s ) and image.saved?
+      redirect '/thread/' + image.id.to_s
+    else
+      redirect '/create', :error => image.errors.to_a.join(' - ')
+    end
+  when "video"
+    # Uh, too lazy for this
+  when "link"
+    if !params[:url].empty? and !params[:title].empty?
+      # Create link
+    else
+      redirect '/create', :error => "A link post requires the link itself and a title"
+    end
+  else
+    redirect '/create'
+  end
 end
 
 post '/activitiy/:id/edit' do |id|

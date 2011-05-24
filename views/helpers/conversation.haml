@@ -27,3 +27,7 @@
         %div.item_content.format
           :markdown
             #{activity.content}
+    - if activity.type == :image
+      %li.item_image
+        %a{ :href => activity.image.url }
+          %img.framed_image{ :src => activity.image.url(:medium) }

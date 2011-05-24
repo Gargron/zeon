@@ -61,28 +61,39 @@
             %a.object{ :href => "" } an image
             %span.time= ago(activity.created_at)
           %div.item_content
-            %a.item_image{ :href => "#" }
-              %img{ :src => "http://placehold.it/220x240", :width => "220", :height => "240" }
+            %a.item_image{ :href => "/thread/" + activity.id.to_s }
+              %img.framed_image{ :src => activity.image.url(:thumb_dash) }
             %div.item_image_info
               %dl
                 %dt Size:
-                %dd 1.6 MB
+                %dd= make_bytes(activity.image.size)
               %dl
                 %dt Dimensions:
-                %dd 1456x757
-              %dl
-                %dt Source:
                 %dd
-                  %a{ :href => "#" } http://pixiv.net/&#0133;?id=12345
-            %blockquote.item_image_comment.format
-              :markdown
-                #{activity.content}
+                  = (activity.image_dimensions || "Unknown")
+                  - if activity.image_dimensions
+                    - dimensions = activity.image_dimensions.split("x")
+                    - width  = dimensions[0]
+                    - height = dimensions[1]
+                    - mp     = (width.to_f * height.to_f) / 1000000.0
+                    - mp     = (mp * 10).round / 10.0
+                    = "(" + mp.to_s + " MP)"
+              - if !activity.meta.empty? and activity.meta.has_key?("source")
+                %dl
+                  %dt Source:
+                  %dd
+                    %a{ :href => activity.meta["source"] }= activity.meta["source"]
+            - if activity.content.length > 0
+              %blockquote.item_image_comment.format
+                :markdown
+                  #{activity.content}
           %div.item_utils
             %ul
               %li
                 %a.like.boxed{ :href => "#" } Appreciate
               %li
-                0 viewers
+                = activity.meta['post_count']
+                comments
               %li
                 Tagged:
                 - activity.tags.each do |tag|

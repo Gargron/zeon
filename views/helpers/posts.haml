@@ -1,13 +1,19 @@
 %ul.posts
   - @posts.each do |activity|
-    %li.item{ :id => "a" + activity.id.to_s }
+    %li.item{ :id => "a" + activity.id.to_s, :class => "item_" + activity.type.to_s }
       %div.item_content
-        %h2
-          %a{ :href => "/thread/" + activity.id.to_s }= activity.title
-      %div.item_utils
-        Tagged:
-        - activity.tags.each do |tag|
-          %a.boxed{ :href => "/tag/" + tag.name }= tag.name
+        - if [:post, :video, :link, :question, :event].include? activity.type
+          %h2
+            %a{ :href => "/thread/" + activity.id.to_s }
+              = activity.title
+        - if activity.type == :image
+          %a.framed_image_holder.fih_200x150{ :href => "/thread/" + activity.id.to_s }
+            %img.framed_image{ :src => activity.image.url(:thumb_all) }
+      - if activity.type != :image
+        %div.item_utils
+          Tagged:
+          - activity.tags.each do |tag|
+            %a.boxed{ :href => "/tag/" + tag.name }= tag.name
       %div.item_meta
         %ul
           %li
@@ -15,15 +21,16 @@
               %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
               %span.name= activity.user.name
             %span.time= ago(activity.created_at)
-          %li
-            %span.likes
-              = activity.meta['like_count']
-              likes
-            %span.posts
-              = activity.meta['post_count']
-              posts
-          %li
-            %a.last_reply{ :href =>  goto(activity.id, activity.meta['bumped_id'], 20) }
-              %span.what Last reply by
-              %span.name= activity.meta['bumped_by']
-              %span.time= ago(activity.meta['bumped_at'])
+          - if activity.type != :image
+            %li
+              %span.likes
+                = activity.meta['like_count']
+                likes
+              %span.posts
+                = activity.meta['post_count']
+                posts
+            %li
+              %a.last_reply{ :href =>  goto(activity.id, activity.meta['bumped_id'], 20) }
+                %span.what Last reply by
+                %span.name= activity.meta['bumped_by']
+                %span.time= ago(activity.meta['bumped_at'])

@@ -31,6 +31,9 @@ GEM
     dm-mysql-adapter (1.1.0)
       dm-do-adapter (~> 1.1.0)
       do_mysql (~> 0.10.2)
+    dm-paperclip (2.4.1)
+      datamapper
+      extlib
     dm-serializer (1.1.0)
       dm-core (~> 1.1.0)
       fastercsv (~> 1.5.4)
@@ -50,6 +53,7 @@ GEM
       dm-core (~> 1.1.0)
     do_mysql (0.10.5)
       data_objects (= 0.10.5)
+    extlib (0.9.15)
     fastercsv (1.5.4)
     haml (3.1.1)
     json (1.4.6)
@@ -101,6 +105,7 @@ DEPENDENCIES
   bcrypt-ruby (>= 2.1.4)
   datamapper (>= 1.1.0)
   dm-mysql-adapter
+  dm-paperclip
   haml
   proudhon
   rack-flash
