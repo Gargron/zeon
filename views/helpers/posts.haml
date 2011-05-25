@@ -1,5 +1,5 @@
 %ul.posts
-  - @posts.each do |activity|
+  - @f_posts.each do |activity|
     %li.item{ :id => "a" + activity.id.to_s, :class => "item_" + activity.type.to_s }
       %div.item_content
         - if [:post, :video, :link, :question, :event].include? activity.type

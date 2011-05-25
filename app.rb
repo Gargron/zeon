@@ -367,6 +367,32 @@ get %r{/all(/sort:([popular|latest|oldest|updated]+))?(/page/([\d]+))?} do |o1, 
 
   @posts = Activity.public.all( sort ).paginate( :page => p, :per_page => 20 )
 
+  @f_posts = []
+  last_image = nil
+  image_i = 0
+
+  @posts.each do |a|
+    if a.type == :image
+      if image_i == 0
+        @f_posts.push a
+        last_image = @f_posts.index a
+        image_i += 1
+      else
+        posts1 = @f_posts[0..last_image]
+        posts2 = @f_posts[(last_image+1)..-1]
+        posts1.push a
+        @f_posts = posts1.concat(posts2)
+        last_image = @f_posts.index a
+        if(image_i < 2)
+          image_i += 1
+        else
+          image_i = 0
+        end
+      end
+    else
+      @f_posts.push a
+    end
+  end
   haml :index
 end
 
