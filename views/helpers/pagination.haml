@@ -10,11 +10,11 @@
             %span.circle
             %span.number= i[:text]
           - else
-            %a{ :href => request.path_info.gsub(/page\/[\d]+/, '') + "page/" + i[:text].to_s }
+            %a{ :href => request.path_info.gsub(/page\/[\d]+/, '') + "/page/" + i[:text].to_s }
               %span.circle
               %span.number= i[:text]
         - else
           = i[:text]
     %li
-      %a{ :href => request.path_info.gsub(/page\/[\d]+/, '') + "page/" + @links.last[:text].to_s }
+      %a{ :href => request.path_info.gsub(/page\/[\d]+/, '') + "/page/" + @links.last[:text].to_s }
         %span.arrow &raquo;

@@ -5,8 +5,18 @@ ul.conversation
     h1
       font-size: 38px
       font-weight: bold
+      line-height: 1em
       letter-spacing: -1px
       margin: .5em 0 1em
+    h2
+      margin-top: -1em
+      font-size: 18px
+      font-weight: bold
+      a
+        color: #88c6e0
+        text-decoration: none
+        &:hover
+          text-decoration: underline
     div.item_utils
       background: #1a1a1a
       border: 1px solid #0a0a0a
@@ -83,6 +93,8 @@ ul.conversation
           background: #222
           border-top: 1px solid #0a0a0a
           box-shadow: inset 0 1px 0 0 #333
+          &:last-child
+            border-bottom-right-radius: 5px
           dt, dd
             float: left
           dt
@@ -91,6 +103,35 @@ ul.conversation
             width: 130px
             font-weight: bold
       .item_content
-        width: 352px
-        background: rgba(50, 50, 50, 0.8)
-        padding: 10px
+        width: 372px
+        border-top: 1px solid #0a0a0a
+        &>div.format
+          background: #333
+          box-shadow: inset 0 1px 0 0 #444
+          padding: 10px
+          position: relative
+          &:after
+            display: block
+            content: ' '
+            position: absolute
+            border-color: #333 transparent transparent transparent
+            border-style: solid
+            border-width: 14px
+            width: 0
+            height: 0
+            right: 100px
+            bottom: -28px
+            z-index: 2
+        .item_meta
+          padding: 10px
+          margin-top: 1em
+          &>a
+            text-decoration: none
+            .name
+              font-weight: bold
+            .avatar
+              border: 4px solid #0a0a0a
+              float: left
+              margin-right: 10px
+          .time
+            display: block

@@ -19,8 +19,7 @@
           %div.item_content.format
             %h2
               %a{ :href => "/thread/" + activity.id.to_s }= activity.title
-            :markdown
-              #{activity.content}
+            = markdown activity.content
           %div.item_utils
             %ul
               %li
@@ -45,8 +44,7 @@
             %span.time= ago(activity.created_at)
           %div.item_content
             %blockquote.item_reply.format
-              :markdown
-                #{activity.content}
+              = markdown activity.content
           %div.item_utils
             %ul
               %li
@@ -58,7 +56,7 @@
               %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
               %span.name= activity.user.name
             %span.verb uploaded
-            %a.object{ :href => "" } an image
+            %a.object{ :href => "/thread/" + activity.id.to_s } an image
             %span.time= ago(activity.created_at)
           %div.item_content
             %a.item_image{ :href => "/thread/" + activity.id.to_s }
@@ -73,15 +71,14 @@
                   = (activity.image_dimensions || "Unknown")
                   - if activity.image_dimensions
                     = "(" + megapixels(activity.image_dimensions).to_s + " MP)"
-              - if !activity.meta.empty? and activity.meta.has_key?("source")
+              - if !activity.meta.empty? and activity.meta.has_key? "source_url"
                 %dl
                   %dt Source:
                   %dd
-                    %a{ :href => activity.meta["source"] }= activity.meta["source"]
+                    %a{ :href => activity.meta["source_url"] }= ellipse_url(activity.meta["source_url"], 20)
             - if activity.content.length > 0
               %blockquote.item_image_comment.format
-                :markdown
-                  #{activity.content}
+                = markdown activity.content
           %div.item_utils
             %ul
               %li
@@ -93,3 +90,29 @@
                 Tagged:
                 - activity.tags.each do |tag|
                   %a.boxed{ :href => "" }= tag.name
+      - if activity.type == :link
+        %li.item.item_link{ :id => "a" + activity.id.to_s }
+          %div.item_meta
+            %a{ :href => "/user/" + activity.user.name }
+              %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
+              %span.name= activity.user.name
+            %span.verb shared
+            %a.object{ :href => "/thread/" + activity.id.to_s } a link
+            %span.time= ago(activity.created_at)
+          %div.item_content.format
+            %h2
+              %a{ :href => "/thread/" + activity.id.to_s }= activity.title
+              %small
+                %a.tt{ :href => activity.meta["url"], :title => activity.meta["url"], :target => '_blank', :rel => 'nofollow' }= ellipse_url(activity.meta["url"], 80)
+            = markdown activity.content
+          %div.item_utils
+            %ul
+              %li
+                %a.like.boxed{ :href => "#" } Appreciate
+              %li
+                = activity.meta['post_count']
+                posts
+              %li
+                Tagged:
+                - activity.tags.each do |tag|
+                  %a.boxed{ :href => "/tag/" + tag.name }= tag.name

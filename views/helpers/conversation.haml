@@ -1,9 +1,12 @@
 %ul.conversation
   - @conversation.each do |activity|
-    - if activity.type == :post || activity.type == :reply
-      - if activity.type == :post
+    - if [:post, :reply, :link].include? activity.type
+      - if [:post, :link].include? activity.type
         %li.item_first
           %h1= activity.title
+          - if activity.type == :link
+            %h2
+              %a.tt{ :href => activity.meta["url"], :title => activity.meta["url"], :target => '_blank', :rel => 'nofollow' }= ellipse_url(activity.meta["url"], 60)
           %div.item_utils
             %ul
               %li
@@ -16,17 +19,17 @@
                 Tagged:
                 - activity.tags.each do |tag|
                   %a.boxed{ :href => "/tag/" + tag.name }= tag.name
-      %li.item{ :id => "p" + activity.id.to_s }
-        %div.item_meta
-          %a.author.tt{ :href => "/user/" + activity.user.name, :title => (activity.user.blob['real_name'] || nil) }
-            %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
-            %span.name= activity.user.name
-          %span.id
-            %a{ :href => "/thread/" + @item.id.to_s + "#p" + activity.id.to_s }= "#" + activity.id.to_s
-          %span.time= ago(activity.created_at)
-        %div.item_content.format
-          :markdown
-            #{activity.content}
+      - if !activity.content.empty?
+        %li.item{ :id => "p" + activity.id.to_s }
+          %div.item_meta
+            %a.author.tt{ :href => "/user/" + activity.user.name, :title => (activity.user.blob['real_name'] || nil) }
+              %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
+              %span.name= activity.user.name
+            %span.id
+              %a{ :href => "/thread/" + @item.id.to_s + "#p" + activity.id.to_s }= "#" + activity.id.to_s
+            %span.time= ago(activity.created_at)
+          %div.item_content.format
+            = markdown activity.content
     - if activity.type == :image
       %li.item_image
         %a.framed_image_holder.fih_600{ :href => activity.image.url }
@@ -35,24 +38,26 @@
           %li
             %div.item_image_info
               %dl
-                %dt Posted at:
-                %dd= ago(activity.created_at)
-              %dl
-                %dt Posted by:
-                %dd
-                  %a.author.tt{ :href => "/user/" + activity.user.name, :title => (activity.user.blob['real_name'] || nil) }= activity.user.name
-              %dl
                 %dt Likes:
                 %dd= activity.meta["like_count"]
+              - if activity.meta.has_key? "source_url"
+                %dl
+                  %dt Source:
+                  %dd
+                    %a.tt{ :href => activity.meta["source_url"], :title => activity.meta["source_url"] }= ellipse_url(activity.meta["source_url"], 15)
               %dl
                 %dt Size:
                 %dd= make_bytes(activity.image.size)
               %dl
                 %dt Dimensions:
                 %dd= activity.image_dimensions + " (" + megapixels(activity.image_dimensions).to_s + " MP)"
-          %li.item_content.format
-            :markdown
-              #{activity.content}
+          %li.item_content
+            %div.format= markdown activity.content
+            %div.item_meta
+              %a.tt{ :href => "/user/" + activity.user.name, :title => (activity.user.blob['real_name'] || nil) }
+                %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
+                %span.name= activity.user.name
+              %span.time= ago(activity.created_at)
         %div.item_tags
           - activity.tags.each do |tag|
             %a.boxed{ :href => "/tag/" + tag.name }= tag.name

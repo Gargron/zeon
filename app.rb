@@ -9,6 +9,7 @@ require 'proudhon'
 
 require 'yaml'
 require 'fileutils'
+require 'uri'
 
 require 'sinatra/jsonp'
 require 'sinatra/session'
@@ -165,7 +166,7 @@ class Activity
   after :create do
     # Denormalize
     if NEW_CONTENT.include? self.type
-      self.meta = { :post_count => 1, :like_count => 0, :bumped_id => self.id, :bumped_by => self.user.name, :bumped_at => self.created_at }
+      self.meta = meta.merge( "post_count" => 1, "like_count" => 0, "bumped_id" => self.id, "bumped_by" => self.user.name, "bumped_at" => self.created_at )
       self.save
     end
     # Update parent's denormalization
@@ -341,6 +342,17 @@ helpers do
     mp     = (mp * 10).round / 10.0
     mp
   end
+
+  def ellipse_url(url, length = 30)
+    url = url.gsub(/http:\/\/(www\.)?/, "")
+    if url.length >= length
+      url1 = url[0..(length / 2)]
+      url2 = url[-(length / 2)..-1]
+      url1 + "&hellip;" + url2
+    else
+      url
+    end
+  end
 end
 
 ## Controllers
@@ -399,7 +411,7 @@ end
 get %r{/home(/page/([\d]+))?} do |o, p|
   session!
 
-  @activity = @cur_user.notifications.activities(:order => :id.desc).paginate({ :page => p, :per_page => 20})
+  @activity = @cur_user.notifications.activities(:order => :id.desc).paginate({ :page => p, :per_page => 10})
 
   haml :dashboard
 end
@@ -452,8 +464,11 @@ post '/activity' do
       redirect '/create', :error => "An image post requires an actual file to be uploaded!"
     end
     # Create image
+    unless params[:url].empty? or !(params[:url] =~ URI::regexp).nil?
+      redirect '/create', :error => "The source URL you entered wasn't a URL. Either input a real one or none at all."
+    end
     dimensions = Paperclip::Geometry.from_file(params[:image_file][:tempfile])
-    if image = Activity.create( :type => :image, :user => @cur_user, :content => params[:text], :image => paper_mash(params[:image_file]), :image_dimensions => dimensions.width.round.to_s + "x" + dimensions.height.round.to_s ) and image.saved?
+    if image = Activity.create( :type => :image, :user => @cur_user, :content => params[:text], :meta => { :source_url => params[:url] }, :image => paper_mash(params[:image_file]), :image_dimensions => dimensions.width.round.to_s + "x" + dimensions.height.round.to_s ) and image.saved?
       redirect '/thread/' + image.id.to_s
     else
       redirect '/create', :error => image.errors.to_a.join(' - ')
@@ -463,6 +478,15 @@ post '/activity' do
   when "link"
     if !params[:url].empty? and !params[:title].empty?
       # Create link
+      if !(params[:url] =~ URI::regexp).nil?
+        if link = Activity.create( :type => :link, :user => @cur_user, :title => params[:title], :content => params[:text], :meta => { :url => params[:url] } ) and link.saved?
+          redirect '/thread/' + link.id.to_s
+        else
+          redirect '/create', :error => link.errors.to_a.join(' - ')
+        end
+      else
+        redirect '/create', :error => "The URL you entered wasn't a valid URL."
+      end
     else
       redirect '/create', :error => "A link post requires the link itself and a title"
     end
