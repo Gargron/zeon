@@ -53,11 +53,12 @@
           = yield
         %aside#sidebar
           - if session?
-            %div.widget.important
-              %h4
-                %a.close{ :href => "javascript:;" } &#215;
-                Update
-              %p Hello, this is an update. It is awesome, I daresay; also commas are not that important. But it doesn't really matter, I just need placeholder text.
+            - if ann = @cur_user.notifications.activities( :type => :announcement, :limit => 1 ).first
+              %div.widget.important
+                %h4
+                  %a.close{ :href => "javascript:;" } &#215;
+                  = ann.title
+                = markdown(ann.content)
           %div.widget
             %h4 Advertising
             %p.half_text_ad

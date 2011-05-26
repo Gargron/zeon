@@ -177,16 +177,24 @@ class Activity
       self.parent.updated_at = DateTime.now
       self.parent.save
     end
+    if self.type == :like
+      self.parent.meta = parent.meta.merge( "like_count" => parent.meta.fetch("like_count", 0) + 1 )
+      self.parent.save
+    end
     unless PRIVATE.include? self.type
-      mentions = User.all(:name => content.scan(MENTION))
-      self.tags = content.scan(HASHTAG).flatten.map {|t| Tag.first(:name => t) || Tag.create(:name => t) }
-      self.group = Group.first(:name => content.scan(GROUPTAG))
-      self.save
-
       root = self.parent || self
-      notify(:mention, mentions)
-      notify(:group, root.group.users) if root.group
-      notify(:tag, root.tags.users)
+
+      unless self.content.nil?
+        mentions = User.all(:name => content.scan(MENTION))
+        self.tags = content.scan(HASHTAG).flatten.map {|t| Tag.first(:name => t) || Tag.create(:name => t) }
+        self.group = Group.first(:name => content.scan(GROUPTAG))
+        self.save
+
+        notify(:mention, mentions)
+        notify(:group, root.group.users) if root.group
+        notify(:tag, root.tags.users)
+      end
+
       notify(:activity, self.user.friendships2.all(:accepted => true).users)
       notify(:mine, [ root.user ])
       notify(:bookmark, root.children(:type => :bookmark).users)

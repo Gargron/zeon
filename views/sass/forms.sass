@@ -5,11 +5,13 @@ form
   border-radius: 10px
   box-shadow: 0 -1px 0 #000, 0 5px 20px rgba(0, 0, 0, 0.2)
   padding: 10px
-  &.notabox
+  &.notabox, &.no_form
     background: transparent
     border: 0
     padding: 0
     box-shadow: none
+  &.no_form
+    display: inline-block
   fieldset
     legend
       font-size: 24px
@@ -194,3 +196,18 @@ button
     &:active
       border: 1px solid #060b06
       box-shadow: inset 0 0 8px 2px #060b06, 0 1px 0 0 #1d361d
+  &.boxed
+    border: 0
+    display: inline-block
+    text-shadow: none
+    text-transform: none
+    width: auto
+    line-height: inherit
+    font-size: inherit
+    font-family: inherit
+    font-weight: normal
+    color: inherit
+    box-shadow: none
+    &:active
+      box-shadow: none
+      border: 0

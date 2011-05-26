@@ -17,13 +17,22 @@
                 thread
             %span.time= ago(activity.created_at)
           %div.item_content.format
-            %h2
-              %a{ :href => "/thread/" + activity.id.to_s }= activity.title
-            = markdown activity.content
+            - if activity.type == :like
+              %h2
+                %a{ :href => "/thread/" + activity.parent.id.to_s }= activity.parent.title
+              = markdown activity.parent.content
+            - else
+              %h2
+                %a{ :href => "/thread/" + activity.id.to_s }= activity.title
+              = markdown activity.content
           %div.item_utils
             %ul
-              %li
-                %a.like.boxed{ :href => "#" } Appreciate
+              - if activity.user.id != @cur_user.id
+                %li
+                  %form.no_form{ :action => "/activity/" + activity.id.to_s + "/like", :method => "post"}
+                    %button.like.boxed{ :type => "submit" } Appreciate
+              - else
+                %li This belongs to you
               %li
                 = activity.meta['post_count']
                 posts
@@ -81,8 +90,12 @@
                 = markdown activity.content
           %div.item_utils
             %ul
-              %li
-                %a.like.boxed{ :href => "#" } Appreciate
+              - if activity.user.id != @cur_user.id
+                %li
+                  %form.no_form{ :action => "/activity/" + activity.id.to_s + "/like", :method => "post"}
+                    %button.like.boxed{ :type => "submit" } Appreciate
+              - else
+                %li This belongs to you
               %li
                 = activity.meta['post_count']
                 comments
@@ -113,8 +126,12 @@
             = markdown activity.content
           %div.item_utils
             %ul
-              %li
-                %a.like.boxed{ :href => "#" } Appreciate
+              - if activity.user.id != @cur_user.id
+                %li
+                  %form.no_form{ :action => "/activity/" + activity.id.to_s + "/like", :method => "post"}
+                    %button.like.boxed{ :type => "submit" } Appreciate
+              - else
+                %li This belongs to you
               %li
                 = activity.meta['post_count']
                 posts

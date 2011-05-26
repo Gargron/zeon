@@ -10,8 +10,13 @@
           %div.item_utils
             %ul
               %li
-                0 likes &bull;
-                %a.boxed{ :href => "#" } Appreciate
+                = activity.meta["like_count"]
+                likes &bull;
+                - if activity.user.id != @cur_user.id
+                  %form.no_form{ :action => "/activity/" + activity.id.to_s + "/like", :method => "post"}
+                    %button.like.boxed{ :type => "submit" } Appreciate
+                - else
+                  This belongs to you
               %li
                 = activity.meta['post_count']
                 posts
@@ -40,7 +45,11 @@
             %div.item_image_info
               %dl
                 %dt Likes:
-                %dd= activity.meta["like_count"]
+                %dd
+                  = activity.meta["like_count"]
+                  - if activity.user.id != @cur_user.id
+                    %form.no_form{ :action => "/activity/" + activity.id.to_s + "/like", :method => "post"}
+                      %button.like.boxed{ :type => "submit" } Appreciate
               - if activity.meta.has_key? "source_url"
                 %dl
                   %dt Source:
@@ -81,8 +90,12 @@
               %span.time= ago(activity.created_at)
             %li.likes
               = activity.meta["like_count"]
-              likes
-              %a.boxed{ :href => "#" } Appreciate
+              likes &bull;
+              - if activity.user.id != @cur_user.id
+                %form.no_form{ :action => "/activity/" + activity.id.to_s + "/like", :method => "post"}
+                  %button.like.boxed{ :type => "submit" } Appreciate
+              - else
+                This belongs to you
           %div.item_tags
             - activity.tags.each do |tag|
               %a.boxed{ :href => "/tag/" + tag.name }= tag.name
