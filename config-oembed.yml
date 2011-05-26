@@ -1,0 +1,29 @@
+:config:
+  :method: "NetHTTP"
+
+:providers:
+  :vimeo: "http://www.vimeo.com/api/oembed.{format}"
+  :hulu: "http://www.hulu.com/api/oembed.{format}"
+  :viddler: "http://lab.viddler.com/services/oembed/"
+  :youtube: "http://www.youtube.com/oembed"
+
+:youtube:
+  :format: "json"
+  :schemes: 
+    - "http://www.youtube.com/watch?v=*"
+
+:vimeo:
+  :format: "json"
+  :schemes:
+    - "http://vimeo.com/*"
+    - "http://vimeo.com/groups/*/videos/*"
+
+:hulu:
+  :format: "xml"
+  :schemes:
+    - "http://www.hulu.com/watch/*"
+    
+:viddler:
+  :format: "xml"
+  :schemes:
+    - "http://*.viddler.com/*"

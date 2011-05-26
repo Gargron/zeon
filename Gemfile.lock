@@ -60,6 +60,8 @@ GEM
     json_pure (1.5.1)
     mime-types (1.16)
     nokogiri (1.4.4)
+    oembed_links (0.1.9)
+      json
     proudhon (0.0.16)
       json
       nokogiri
@@ -107,6 +109,7 @@ DEPENDENCIES
   dm-mysql-adapter
   dm-paperclip
   haml
+  oembed_links
   proudhon
   rack-flash
   rdiscount

@@ -5,7 +5,12 @@
         - if [:post, :video, :link, :question, :event].include? activity.type
           %h2
             %a{ :href => "/thread/" + activity.id.to_s }
+              - if activity.type != :post
+                %span.type= activity.type.to_s.capitalize + ":"
               = activity.title
+            - if activity.type == :link
+              %small
+                %a.tt{ :href => activity.meta["url"], :title => activity.meta["url"], :target => '_blank', :rel => 'nofollow' }= ellipse_url(activity.meta["url"], 60)
         - if activity.type == :image
           %a.framed_image_holder.fih_200x150{ :href => "/thread/" + activity.id.to_s }
             %img.framed_image{ :src => activity.image.url(:thumb_all) }

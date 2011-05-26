@@ -18,8 +18,10 @@ require 'sinatra/redirect_with_flash'
 require 'will_paginate'
 require 'dm-paperclip'
 require 'dm-paperclip/geometry'
+require 'oembed_links'
 
 config = YAML.load_file('config.yml')
+OEmbed.register_yaml_file(Dir.pwd + "/config-oembed.yml")
 
 set :site_title, config['site_title']
 set :show_exceptions, TRUE
@@ -197,6 +199,15 @@ class Activity
       all(:type => NEW_CONTENT, :parent_id => nil)
   end
 
+  def add_tags(spaced_tags)
+    unless spaced_tags.empty?
+      spaced_tags = spaced_tags.scan(/[\w\s!\(\)\&\+_-]/).join
+      tags = spaced_tags.downcase.split(" ")
+      self.tags = tags.flatten.map { |t| Tag.first(:name => t) || Tag.create(:name => t) }
+      self.save
+    end
+  end
+
   def notify(kind, users)
     users.each do |target|
       self.notifications << Notification.create(:kind => kind, :user => target, :sender => self.user, :activity => self, :parent => self.parent || self)
@@ -236,6 +247,23 @@ before do
   if session? and !@cur_user
     session_end!
     redirect '/'
+  end
+end
+
+class OEmbed
+  def self.valid?(url, *attribs)
+    unless (vschemes = @schemes.select { |a| url =~ a[0] }).empty?
+      regex, provider = vschemes.first
+      data = get_url_for_provider(url, provider, *attribs)
+      if data.keys.empty?
+        false
+      else
+        response = OEmbed::Response.new(provider, url, data)
+        response
+      end
+    else
+      false
+    end
   end
 end
 
@@ -377,7 +405,7 @@ get %r{/all(/sort:([popular|latest|oldest|updated]+))?(/page/([\d]+))?} do |o1, 
     sort = { :order => :updated_at.desc }
   end
 
-  @posts = Activity.public.all( sort ).paginate( :page => p, :per_page => 20 )
+  @posts = Activity.public.all( sort ).paginate( :page => p, :per_page => 15 )
 
   @f_posts = []
   last_image = nil
@@ -452,6 +480,7 @@ post '/activity' do
   when "post"
     if !params[:title].empty? and !params[:text].empty?
       if freetext = Activity.create( :title => params[:title], :type => :post, :content => params[:text], :user => @cur_user ) and freetext.saved?
+        freetext.add_tags(params[:tags])
         redirect '/thread/' + freetext.id.to_s
       else
         redirect '/create', :error => freetext.errors.to_a.join(' - ')
@@ -468,18 +497,38 @@ post '/activity' do
       redirect '/create', :error => "The source URL you entered wasn't a URL. Either input a real one or none at all."
     end
     dimensions = Paperclip::Geometry.from_file(params[:image_file][:tempfile])
-    if image = Activity.create( :type => :image, :user => @cur_user, :content => params[:text], :meta => { :source_url => params[:url] }, :image => paper_mash(params[:image_file]), :image_dimensions => dimensions.width.round.to_s + "x" + dimensions.height.round.to_s ) and image.saved?
+    if image = Activity.create( :type => :image, :user => @cur_user, :content => params[:text], :meta => params[:url].empty? ? {} : { :source_url => params[:url] }, :image => paper_mash(params[:image_file]), :image_dimensions => dimensions.width.round.to_s + "x" + dimensions.height.round.to_s ) and image.saved?
+      image.add_tags(params[:tags])
       redirect '/thread/' + image.id.to_s
     else
       redirect '/create', :error => image.errors.to_a.join(' - ')
     end
   when "video"
-    # Uh, too lazy for this
+    if !params[:title].empty? and !params[:url].empty?
+      if (params[:url] =~ URI::regexp).nil?
+        redirect '/create', :error => "That 'URL' you got there wasn't a valid URL!"
+      end
+      video_html = nil
+      if (oembed = OEmbed.valid? params[:url])
+        video_html = oembed.to_s
+      else
+        redirect '/create', :error => "Sorry, we currently support only Youtube, Vimeo, Hulu and Viddler"
+      end
+      if video = Activity.create( :type => :video, :user => @cur_user, :title => params[:title], :content => params[:text], :meta => { :video_url => params[:url], :video_html => video_html } ) and video.saved?
+        video.add_tags(params[:tags])
+        redirect '/thread/' + video.id.to_s
+      else
+        redirect '/create', :error => video.errors.to_a.join(' - ')
+      end
+    else
+      redirect '/create', :error => "A video post requires a title and a URL!"
+    end
   when "link"
     if !params[:url].empty? and !params[:title].empty?
       # Create link
       if !(params[:url] =~ URI::regexp).nil?
         if link = Activity.create( :type => :link, :user => @cur_user, :title => params[:title], :content => params[:text], :meta => { :url => params[:url] } ) and link.saved?
+          link.add_tags(params[:tags])
           redirect '/thread/' + link.id.to_s
         else
           redirect '/create', :error => link.errors.to_a.join(' - ')
@@ -504,6 +553,7 @@ post '/activity/:id/delete' do |id|
 end
 
 post '/activity/:id/:action' do |id,action|
+  # Reply
   if !session?
     if !params[:username].empty? and !params[:password].empty?
       if user = User.first(:name => params[:username], :status => [:active, :administrator]) and user.password == params[:password]
@@ -530,13 +580,18 @@ post '/activity/:id/:action' do |id,action|
       user = User.first(:id => session[:id])
       parent = Activity.first( :id => id, :parent_id => nil )
       halt 404 unless parent
-      if reply = Activity.create( :parent_id => id, :user => user, :type => :reply, :content => params[:content])
+      if reply = Activity.create( :parent_id => id, :user => user, :type => :reply, :content => params[:content]) and reply.saved?
         redirect goto(id, reply.id, 20)
       end
     end
   end
-  # Reply
   # Like
+  if action == "like"
+    session!
+    if like = Activity.create( :parent_id => id, :user => @cur_user, :type => :like) and like.saved?
+      redirect '/thread/' + id.to_s
+    end
+  end
   # Tag
   # Untag
   # Like

@@ -1,6 +1,6 @@
 (function() {
   $("#password").showPassword('.box', {text: 'Check your password twice', className: 'check_password'});
-  $(".tt").tipTip({delay: 100});
+  $(".tt").tipTip({delay: 100, maxWidth: "auto"});
   $(".tt_form").tipTip({delay: 100, defaultPosition: "right", attribute: "data-tooltip"});
   $(".choose_type a").click(function(e) {
     e.preventDefault();

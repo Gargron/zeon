@@ -25,6 +25,7 @@
             %a.author.tt{ :href => "/user/" + activity.user.name, :title => (activity.user.blob['real_name'] || nil) }
               %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
               %span.name= activity.user.name
+              %span.type= @item.user.id == activity.user.id ? "Author" : (activity.user.status == :administrator ? "Staff" : "")
             %span.id
               %a{ :href => "/thread/" + @item.id.to_s + "#p" + activity.id.to_s }= "#" + activity.id.to_s
             %span.time= ago(activity.created_at)
@@ -61,3 +62,27 @@
         %div.item_tags
           - activity.tags.each do |tag|
             %a.boxed{ :href => "/tag/" + tag.name }= tag.name
+    - if activity.type == :video
+      %li.item_video
+        %div.item_content
+          %h1= activity.title
+          %h2
+            %a.tt{ :href => activity.meta["video_url"], :title => activity.meta["video_url"], :target => '_blank', :rel => 'nofollow' }= ellipse_url(activity.meta["video_url"], 60)
+          - if activity.meta.has_key? "video_html"
+            =  activity.meta["video_html"]
+          - if !activity.content.empty?
+            %div.format
+              = markdown(activity.content)
+          %ul.item_meta
+            %li.author
+              %a.tt{ :href => "/user/" + activity.user.name, :title => (activity.user.blob['real_name'] || nil) }
+                %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
+                %span.name= activity.user.name
+              %span.time= ago(activity.created_at)
+            %li.likes
+              = activity.meta["like_count"]
+              likes
+              %a.boxed{ :href => "#" } Appreciate
+          %div.item_tags
+            - activity.tags.each do |tag|
+              %a.boxed{ :href => "/tag/" + tag.name }= tag.name
