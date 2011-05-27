@@ -110,6 +110,8 @@ post '/activity/:id/:action' do |id,action|
       halt 404 unless parent
       if reply = Activity.create( :parent_id => id, :user => user, :type => :reply, :content => params[:content]) and reply.saved?
         redirect goto(id, reply.id, 20)
+      else
+        redirect '/thread/' + id.to_s + '#reply', :error => reply.errors.to_a.join(' - ')
       end
     end
   end

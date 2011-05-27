@@ -30,6 +30,7 @@ class Activity
   property :image_dimensions, String
 
   validates_presence_of :title, :if => lambda { |t| REQUIRES_TITLE.include? t.type }
+  validates_presence_of :content, :if => lambda { |t| [:post, :reply].include? t.type }
 
   validates_attachment_presence :image, :if => lambda { |t| t.type == :image }
   validates_attachment_content_type :image, :content_type => [ "image/png", "image/jpg", "image/jpeg", "image/gif" ]
