@@ -1,0 +1,6 @@
+require 'models/user'
+require 'models/friendship'
+require 'models/tag'
+require 'models/group'
+require 'models/activity'
+require 'models/notification'

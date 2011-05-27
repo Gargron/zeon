@@ -1,0 +1,16 @@
+%div.item_head
+  %h1= @c.title
+  %h2
+    %a.tt{ :href => @c.meta["url"], :title => @c.meta["url"], :target => '_blank', :rel => 'nofollow' }= ellipse_url(@c.meta["url"], 60)
+  %div.item_utils
+    %ul
+      %li
+        = @c.meta["like_count"]
+        likes &bull;
+        = haml :"helpers/like"
+      %li
+        = @c.meta['post_count']
+        posts
+
+- if not @c.content.empty?
+  = haml :"helpers/conversation_reply"

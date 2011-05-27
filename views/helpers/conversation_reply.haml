@@ -1,0 +1,10 @@
+%div.item_meta
+  %a.author.tt{ :href => "/user/" + @c.user.name, :title => (@c.user.blob['real_name'] || nil) }
+    %img.avatar{ :src => @c.user.avatar(48), :width => "48", :height => "48" }
+    %span.name= @c.user.name
+    %span.type= @item.user.id == @c.user.id ? "Author" : (@c.user.status == :administrator ? "Staff" : "")
+  %span.id
+    %a{ :href => "/thread/" + @item.id.to_s + "#p" + @c.id.to_s }= "#" + @c.id.to_s
+  %span.time= ago(@c.created_at)
+%div.item_content.format
+  = markdown @c.content

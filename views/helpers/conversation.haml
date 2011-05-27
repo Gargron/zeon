@@ -1,101 +1,10 @@
 %ul.conversation
-  - @conversation.each do |activity|
-    - if [:post, :reply, :link].include? activity.type
-      - if [:post, :link].include? activity.type
-        %li.item_first
-          %h1= activity.title
-          - if activity.type == :link
-            %h2
-              %a.tt{ :href => activity.meta["url"], :title => activity.meta["url"], :target => '_blank', :rel => 'nofollow' }= ellipse_url(activity.meta["url"], 60)
-          %div.item_utils
-            %ul
-              %li
-                = activity.meta["like_count"]
-                likes &bull;
-                - if activity.user.id != @cur_user.id
-                  %form.no_form{ :action => "/activity/" + activity.id.to_s + "/like", :method => "post"}
-                    %button.like.boxed{ :type => "submit" } Appreciate
-                - else
-                  This belongs to you
-              %li
-                = activity.meta['post_count']
-                posts
-              %li
-                Tagged:
-                - activity.tags.each do |tag|
-                  %a.boxed{ :href => "/tag/" + tag.name }= tag.name
-      - if !activity.content.empty?
-        %li.item{ :id => "p" + activity.id.to_s }
-          %div.item_meta
-            %a.author.tt{ :href => "/user/" + activity.user.name, :title => (activity.user.blob['real_name'] || nil) }
-              %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
-              %span.name= activity.user.name
-              %span.type= @item.user.id == activity.user.id ? "Author" : (activity.user.status == :administrator ? "Staff" : "")
-            %span.id
-              %a{ :href => "/thread/" + @item.id.to_s + "#p" + activity.id.to_s }= "#" + activity.id.to_s
-            %span.time= ago(activity.created_at)
-          %div.item_content.format
-            = markdown activity.content
-    - if activity.type == :image
-      %li.item_image
-        %a.framed_image_holder.fih_600{ :href => activity.image.url }
-          %img.framed_image{ :src => activity.image.url(:medium) }
-        %ul.item_utils
-          %li
-            %div.item_image_info
-              %dl
-                %dt Likes:
-                %dd
-                  = activity.meta["like_count"]
-                  - if activity.user.id != @cur_user.id
-                    %form.no_form{ :action => "/activity/" + activity.id.to_s + "/like", :method => "post"}
-                      %button.like.boxed{ :type => "submit" } Appreciate
-              - if activity.meta.has_key? "source_url"
-                %dl
-                  %dt Source:
-                  %dd
-                    %a.tt{ :href => activity.meta["source_url"], :title => activity.meta["source_url"] }= ellipse_url(activity.meta["source_url"], 15)
-              %dl
-                %dt Size:
-                %dd= make_bytes(activity.image.size)
-              %dl
-                %dt Dimensions:
-                %dd= activity.image_dimensions + " (" + megapixels(activity.image_dimensions).to_s + " MP)"
-          %li.item_content
-            %div.format= markdown activity.content
-            %div.item_meta
-              %a.tt{ :href => "/user/" + activity.user.name, :title => (activity.user.blob['real_name'] || nil) }
-                %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
-                %span.name= activity.user.name
-              %span.time= ago(activity.created_at)
-        %div.item_tags
-          - activity.tags.each do |tag|
-            %a.boxed{ :href => "/tag/" + tag.name }= tag.name
-    - if activity.type == :video
-      %li.item_video
-        %div.item_content
-          %h1= activity.title
-          %h2
-            %a.tt{ :href => activity.meta["video_url"], :title => activity.meta["video_url"], :target => '_blank', :rel => 'nofollow' }= ellipse_url(activity.meta["video_url"], 60)
-          - if activity.meta.has_key? "video_html"
-            =  activity.meta["video_html"]
-          - if !activity.content.empty?
-            %div.format
-              = markdown(activity.content)
-          %ul.item_meta
-            %li.author
-              %a.tt{ :href => "/user/" + activity.user.name, :title => (activity.user.blob['real_name'] || nil) }
-                %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
-                %span.name= activity.user.name
-              %span.time= ago(activity.created_at)
-            %li.likes
-              = activity.meta["like_count"]
-              likes &bull;
-              - if activity.user.id != @cur_user.id
-                %form.no_form{ :action => "/activity/" + activity.id.to_s + "/like", :method => "post"}
-                  %button.like.boxed{ :type => "submit" } Appreciate
-              - else
-                This belongs to you
+  - @conversation.each do |@c|
+    - if [:post, :image, :video, :link, :reply].include? @c.type
+      %li.item{ :class => "item_" + @c.type.to_s, :id => "p" + @c.id.to_s }
+        %div.item_specific
+          = haml :"helpers/conversation_#{@c.type.to_s}"
+        - if @c.type != :reply
           %div.item_tags
-            - activity.tags.each do |tag|
+            - @c.tags.each do |tag|
               %a.boxed{ :href => "/tag/" + tag.name }= tag.name

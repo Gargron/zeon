@@ -1,0 +1,13 @@
+%div.item_head
+  %h1= @c.title
+  %div.item_utils
+    %ul
+      %li
+        = @c.meta["like_count"]
+        likes &bull;
+        = haml :"helpers/like"
+      %li
+        = @c.meta['post_count']
+        posts
+
+= haml :"helpers/conversation_reply"

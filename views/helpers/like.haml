@@ -1,0 +1,8 @@
+- if session?
+  - if @c.likes(@cur_user.id)
+    You like it
+  - elsif @c.user.id != @cur_user.id
+    %form.no_form{ :action => "/activity/" + @c.id.to_s + "/like", :method => "post"}
+      %button.like.boxed{ :type => "submit" } Appreciate
+  - else
+    %li This belongs to you

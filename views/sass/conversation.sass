@@ -1,6 +1,6 @@
 ul.conversation
   list-style: none
-  li.item_first
+  .item_head
     margin-bottom: 1.5em
     h1
       font-size: 38px
@@ -139,10 +139,12 @@ ul.conversation
               margin-right: 10px
           .time
             display: block
-    .item_tags
-      margin-top: 1em
-      .boxed
-        background-color: #000
+  .item_tags
+    margin-top: 1em
+    .boxed
+      background-color: #000
+      &:hover
+        background-color: #0a0a0a
   .item_video
     margin-bottom: 1.5em
     .item_content
@@ -204,7 +206,3 @@ ul.conversation
         width: 300px
         float: right
         text-align: right
-    .item_tags
-      margin-top: 1em
-      .boxed
-        background-color: #000

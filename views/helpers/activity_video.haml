@@ -1,0 +1,6 @@
+%div.format
+  %h2
+    %a{ :href => "/thread/" + @that.id.to_s }= @that.title
+    %small
+      %a.tt{ :href => @that.meta["video_url"], :title => @that.meta["video_url"], :target => '_blank', :rel => 'nofollow' }= ellipse_url(@that.meta["video_url"], 80)
+  = markdown @that.content

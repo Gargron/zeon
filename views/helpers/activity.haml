@@ -1,141 +1,35 @@
 %ul.activity
-  - if session?
-    - @activity.each do |activity|
-      - if activity.type == :post || activity.type == :like
-        %li.item.item_freetext{ :id => "a" + activity.id.to_s }
-          %div.item_meta
-            %a{ :href => "/user/" + activity.user.name }
-              %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
-              %span.name= activity.user.name
-            - if activity.type == :post
-              %span.verb posted
-              %a.object{ :href => "/thread/" + activity.id.to_s } a thread
-            - if activity.type == :like
-              %span.verb liked
-              %a.object{ :href => "/thread/" + activity.parent.id.to_s }
-                = activity.parent.user.name + "'s"
-                thread
-            %span.time= ago(activity.created_at)
-          %div.item_content.format
-            - if activity.type == :like
-              %h2
-                %a{ :href => "/thread/" + activity.parent.id.to_s }= activity.parent.title
-              = markdown activity.parent.content
+  - @activity.each do |@a|
+    - this = (@a.parent || @a)
+    - @that = this
+    - if [:post, :reply, :image, :link, :video, :like].include? @a.type
+      %li.item{ :class => "item_" + this.type.to_s, :id => "a" + @a.id.to_s }
+        %div.item_meta
+          %a{ :href => "/user/" + @a.user.name }
+            %img.avatar{ :src => @a.user.avatar(48), :width => "48", :height => "48" }
+            %span.name= you(@a.user.name)
+          %span.verb= @a.verb
+          %a.object{ :href => "/thread/" + this.id.to_s }= @a.substantive
+        %div.item_content
+          - if not [:reply, :like].include? @a.type
+            = haml :"helpers/activity_#{@a.type.to_s}"
+          - elsif [:reply].include? @a.type
+            = haml :"helpers/activity_reply"
+          - elsif [:like].include? @a.type
+            = haml :"helpers/activity_#{@a.parent.type.to_s}"
+        %div.item_utils
+          %ul
+            - if not [:reply].include? @a.type
+              %li
+                - @c = this
+                = haml :"helpers/like"
+              %li
+                = this.meta['post_count']
+                posts
+              %li
+                Tagged:
+                - this.tags.each do |tag|
+                  %a.boxed{ :href => "/tag/" + tag.name }= tag.name
             - else
-              %h2
-                %a{ :href => "/thread/" + activity.id.to_s }= activity.title
-              = markdown activity.content
-          %div.item_utils
-            %ul
-              - if activity.user.id != @cur_user.id
-                %li
-                  %form.no_form{ :action => "/activity/" + activity.id.to_s + "/like", :method => "post"}
-                    %button.like.boxed{ :type => "submit" } Appreciate
-              - else
-                %li This belongs to you
               %li
-                = activity.meta['post_count']
-                posts
-              %li
-                Tagged:
-                - activity.tags.each do |tag|
-                  %a.boxed{ :href => "/tag/" + tag.name }= tag.name
-      - if activity.type == :reply || activity.type == :comment
-        %li.item.item_indirect{ :id => "a" + activity.id.to_s }
-          %div.item_meta
-            %a{ :href => "/user/" + activity.user.name }
-              %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
-              %span.name= activity.user.name
-            %span.verb replied to
-            %a.object{ :href => "/thread/" + activity.parent.id.to_s }
-              = activity.parent.user.name + "'s"
-              thread
-            %span.time= ago(activity.created_at)
-          %div.item_content
-            %blockquote.item_reply.format
-              = markdown activity.content
-          %div.item_utils
-            %ul
-              %li
-                %a.boxed{ :href => "/thread/" + activity.parent.id.to_s } View in context
-      - if activity.type == :image
-        %li.item.item_image{ :id => "a" + activity.id.to_s }
-          %div.item_meta
-            %a{ :href => "/user/" + activity.user.name }
-              %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
-              %span.name= activity.user.name
-            %span.verb uploaded
-            %a.object{ :href => "/thread/" + activity.id.to_s } an image
-            %span.time= ago(activity.created_at)
-          %div.item_content
-            %a.item_image{ :href => "/thread/" + activity.id.to_s }
-              %img.framed_image{ :src => activity.image.url(:thumb_dash) }
-            %div.item_image_info
-              %dl
-                %dt Size:
-                %dd= make_bytes(activity.image.size)
-              %dl
-                %dt Dimensions:
-                %dd
-                  = (activity.image_dimensions || "Unknown")
-                  - if activity.image_dimensions
-                    = "(" + megapixels(activity.image_dimensions).to_s + " MP)"
-              - if !activity.meta.empty? and activity.meta.has_key? "source_url"
-                %dl
-                  %dt Source:
-                  %dd
-                    %a.tt{ :href => activity.meta["source_url"], :title => activity.meta["source_url"], :target => "_blank", :rel => "nofollow" }= ellipse_url(activity.meta["source_url"], 20)
-            - if activity.content.length > 0
-              %blockquote.item_image_comment.format
-                = markdown activity.content
-          %div.item_utils
-            %ul
-              - if activity.user.id != @cur_user.id
-                %li
-                  %form.no_form{ :action => "/activity/" + activity.id.to_s + "/like", :method => "post"}
-                    %button.like.boxed{ :type => "submit" } Appreciate
-              - else
-                %li This belongs to you
-              %li
-                = activity.meta['post_count']
-                comments
-              %li
-                Tagged:
-                - activity.tags.each do |tag|
-                  %a.boxed{ :href => "" }= tag.name
-      - if [:link, :video].include? activity.type
-        %li.item.item_link{ :id => "a" + activity.id.to_s }
-          %div.item_meta
-            %a{ :href => "/user/" + activity.user.name }
-              %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
-              %span.name= activity.user.name
-            %span.verb shared
-            - if activity.type == :link
-              %a.object{ :href => "/thread/" + activity.id.to_s } a link
-            - if activity.type == :video
-              %a.object{ :href => "/thread/" + activity.id.to_s } a video
-            %span.time= ago(activity.created_at)
-          %div.item_content.format
-            %h2
-              %a{ :href => "/thread/" + activity.id.to_s }= activity.title
-              %small
-                - if activity.type == :link
-                  %a.tt{ :href => activity.meta["url"], :title => activity.meta["url"], :target => '_blank', :rel => 'nofollow' }= ellipse_url(activity.meta["url"], 80)
-                - if activity.type == :video
-                  %a.tt{ :href => activity.meta["video_url"], :title => activity.meta["video_url"], :target => '_blank', :rel => 'nofollow' }= ellipse_url(activity.meta["video_url"], 80)
-            = markdown activity.content
-          %div.item_utils
-            %ul
-              - if activity.user.id != @cur_user.id
-                %li
-                  %form.no_form{ :action => "/activity/" + activity.id.to_s + "/like", :method => "post"}
-                    %button.like.boxed{ :type => "submit" } Appreciate
-              - else
-                %li This belongs to you
-              %li
-                = activity.meta['post_count']
-                posts
-              %li
-                Tagged:
-                - activity.tags.each do |tag|
-                  %a.boxed{ :href => "/tag/" + tag.name }= tag.name
+                %a.boxed{ :href => goto(@a.parent_id, @a.id, 20) } View in context

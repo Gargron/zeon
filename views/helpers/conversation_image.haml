@@ -1,0 +1,31 @@
+%a.framed_image_holder.fih_600{ :href => @c.image.url }
+  %img.framed_image{ :src => @c.image.url(:medium) }
+
+%ul.item_utils
+  %li
+    %div.item_image_info
+      %dl
+        %dt Likes:
+        %dd
+          = @c.meta["like_count"]
+          &bull;
+          = haml :"helpers/like"
+      - if @c.meta.has_key? "source_url"
+        %dl
+          %dt Source:
+          %dd
+            %a.tt{ :href => @c.meta["source_url"], :title => @c.meta["source_url"] }= ellipse_url(@c.meta["source_url"], 15)
+      %dl
+        %dt Size:
+        %dd= make_bytes(@c.image.size)
+      %dl
+        %dt Dimensions:
+        %dd= @c.image_dimensions + " (" + megapixels(@c.image_dimensions).to_s + " MP)"
+  %li.item_content
+    - if (content = @c.content) and not content.empty?
+      %div.format= markdown content
+    %div.item_meta
+      %a.tt{ :href => "/user/" + @c.user.name, :title => (@c.user.blob['real_name'] || nil) }
+        %img.avatar{ :src => @c.user.avatar(48), :width => "48", :height => "48" }
+        %span.name= @c.user.name
+      %span.time= ago(@c.created_at)

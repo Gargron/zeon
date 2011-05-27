@@ -1,0 +1,19 @@
+%div.item_head
+  %h1= @c.title
+  %h2
+    %a.tt{ :href => @c.meta["video_url"], :title => @c.meta["video_url"], :target => '_blank', :rel => 'nofollow' }= ellipse_url(@c.meta["video_url"], 60)
+- if @c.meta.has_key? "video_html"
+  =  @c.meta["video_html"]
+- if (content = @c.content) and not content.empty?
+  %div.format
+    = markdown content
+%ul.item_meta
+  %li.author
+    %a.tt{ :href => "/user/" + @c.user.name, :title => (@c.user.blob['real_name'] || nil) }
+      %img.avatar{ :src => @c.user.avatar(48), :width => "48", :height => "48" }
+      %span.name= @c.user.name
+    %span.time= ago(@c.created_at)
+  %li.likes
+    = @c.meta["like_count"]
+    likes &bull;
+    = haml :"helpers/like"

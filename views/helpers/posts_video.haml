@@ -1,0 +1,7 @@
+%h2
+  %a{ :href => "/thread/" + @p.id.to_s }
+    - if @p.type != :post
+      %span.type= @p.type.to_s.capitalize + ":"
+    = @p.title
+  %small
+    %a.tt{ :href => @p.meta["video_url"], :title => @p.meta["video_url"], :target => '_blank', :rel => 'nofollow' }= ellipse_url(@p.meta["video_url"], 60)

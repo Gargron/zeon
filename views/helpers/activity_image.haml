@@ -1,0 +1,19 @@
+%a.item_image{ :href => "/thread/" + @that.id.to_s }
+  %img.framed_image{ :src => @that.image.url(:thumb_dash) }
+%div.item_image_info
+  %dl
+    %dt Size:
+    %dd= make_bytes(@that.image.size)
+  %dl
+    %dt Dimensions:
+    %dd
+      = @that.image_dimensions
+      = "(" + megapixels(@that.image_dimensions).to_s + "MP)"
+  - if (source = @that.meta.fetch("source_url", false))
+    %dl
+      %dt Source:
+      %dd
+        %a.tt{ :href => source, :title => source, :target => "_blank", :rel => "nofollow" }= ellipse_url(source, 20)
+- if (content = @that.content and !content.empty?)
+  %blockquote.item_image_comment.format
+    = markdown content

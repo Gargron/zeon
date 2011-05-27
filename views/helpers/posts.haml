@@ -1,41 +1,31 @@
 %ul.posts
-  - @f_posts.each do |activity|
-    %li.item{ :id => "a" + activity.id.to_s, :class => "item_" + activity.type.to_s }
-      %div.item_content
-        - if [:post, :video, :link, :question, :event].include? activity.type
-          %h2
-            %a{ :href => "/thread/" + activity.id.to_s }
-              - if activity.type != :post
-                %span.type= activity.type.to_s.capitalize + ":"
-              = activity.title
-            - if activity.type == :link
-              %small
-                %a.tt{ :href => activity.meta["url"], :title => activity.meta["url"], :target => '_blank', :rel => 'nofollow' }= ellipse_url(activity.meta["url"], 60)
-        - if activity.type == :image
-          %a.framed_image_holder.fih_200x150{ :href => "/thread/" + activity.id.to_s }
-            %img.framed_image{ :src => activity.image.url(:thumb_all) }
-      - if activity.type != :image
-        %div.item_utils
-          Tagged:
-          - activity.tags.each do |tag|
-            %a.boxed{ :href => "/tag/" + tag.name }= tag.name
-      %div.item_meta
-        %ul
-          %li
-            %a{ :href => "/user/" + activity.user.name }
-              %img.avatar{ :src => activity.user.avatar(48), :width => "48", :height => "48" }
-              %span.name= activity.user.name
-            %span.time= ago(activity.created_at)
-          - if activity.type != :image
+  - @f_posts.each do |@p|
+    - if [:post, :image, :video, :link].include? @p.type
+      %li.item{ :class => "item_" + @p.type.to_s, :id => "a" + @p.id.to_s }
+        %div.item_content
+          = haml :"helpers/posts_#{@p.type.to_s}"
+        - if @p.type != :image
+          %div.item_utils
+            Tagged:
+            - @p.tags.each do |tag|
+              %a.boxed{ :href => "/tag/" + tag.name }= tag.name
+        %div.item_meta
+          %ul
             %li
-              %span.likes
-                = activity.meta['like_count']
-                likes
-              %span.posts
-                = activity.meta['post_count']
-                posts
-            %li
-              %a.last_reply{ :href =>  goto(activity.id, activity.meta['bumped_id'], 20) }
-                %span.what Last reply by
-                %span.name= activity.meta['bumped_by']
-                %span.time= ago(activity.meta['bumped_at'])
+              %a{ :href => "/user/" + @p.user.name }
+                %img.avatar{ :src => @p.user.avatar(48), :width => "48", :height => "48" }
+                %span.name= @p.user.name
+              %span.time= ago(@p.created_at)
+            - if @p.type != :image
+              %li
+                %span.likes
+                  = @p.meta['like_count']
+                  likes
+                %span.posts
+                  = @p.meta['post_count']
+                  posts
+              %li
+                %a.last_reply{ :href =>  goto(@p.id, @p.meta['bumped_id'], 20) }
+                  %span.what Last reply by
+                  %span.name= @p.meta['bumped_by']
+                  %span.time= ago(@p.meta['bumped_at'])
