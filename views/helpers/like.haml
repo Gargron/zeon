@@ -5,4 +5,6 @@
     %form.no_form{ :action => "/activity/" + @c.id.to_s + "/like", :method => "post"}
       %button.like.boxed{ :type => "submit" } Appreciate
   - else
-    %li This belongs to you
+    This belongs to you
+- else
+  Sign in to like

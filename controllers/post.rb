@@ -135,6 +135,17 @@ post '/activity/:id/:action' do |id,action|
   # Invite
 end
 
+post '/user/:id/:action' do |id, action|
+  session!
+
+  if action == "follow"
+    user = User.first( :id => id )
+    if (follow = @cur_user.follows << user) and follow.saved?
+      redirect '/home', :success => "You are now following #{user.name}"
+    end
+  end
+end
+
 post '/login.json' do
   halt 303 if session?
 

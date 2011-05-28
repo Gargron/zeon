@@ -1,8 +1,8 @@
 # Zeon
 
-**Attention: this software is still under development. This is just a cental repository for contribution.**
+*Attention: this software is still under development. This is just a cental repository for contribution.*
 
-Zeon is a minimalist open-source federated social network. It is written in Ruby using the Sinatra micro-framework, DataMapper and Redis. It aims to be lightweight, easy to install, easy to scale and easy to contribute.
+**Zeon is a minimalist open-source federated message board**. It is written in Ruby using the Sinatra micro-framework, DataMapper and Redis. It aims to provide means of discussion between different websites and people, and to be lightweight, easy to install, easy to scale and easy to contribute.
 
 Our strategy is to use caching and background workers to allow for non-blocking requests, serving a larger number of simultaneous users during peaks with a smaller setup.
 
@@ -10,14 +10,18 @@ The 'federated' part means that users on a certain Zeon instance can communicate
 
 ## Dependencies
 
-Those gems will get the ball rolling:
+We provide a Gemspec file, so all you need to get the ball rolling is to
 
-    sudo gem install sinatra haml will_paginate datamapper redis proudhon bcrypt yaml rspec sinatra-jsonp sinatra-session sinatra-flash sinatra-redirect-with-flash
+    bundle install
 
-Redis is our cache server. For Push support we use Comet. We recomend Thin, Unicorn, Rainbows!, or Phusion Passengers as your Ruby app server.
+For caching support a Redis server is required.
 
-## How it works
+## What it can do
 
-Users are greeted with an activity stream. The user is free to choose what kinds of notifications will show up, like mentions, private messages, bumps, subscriptions or general friend activity. They can optionally browse public posts: the latest, the more popular, filter using tags or user names.
-
-Activities also include content generation (posts, links, images, videos, polls and events), content interaction (replies and comments), social activity (like, vote, attend, reccomend, invite, bookmark and add tag) and private messages.
+* Users can post freetext, image, video and link posts
+* Users can reply to them, like them
+  * Federation: even if the posts are on another server
+* Users can follow each other
+  * Federation: even if the user followed is on another server
+* Users have personalized home feeds
+  * Federation: including posts from followed people on other servers

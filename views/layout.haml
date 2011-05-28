@@ -22,16 +22,24 @@
                   %a{ :href => "/all" } All
                 %li
                   %a{ :href => "/all/sort:popular" } Popular
-            - if session?
-              %li.subnav_wrap
-                %a{ :href => "/all" } Posts &#9662;
-                %ul.subnav
+            %li.subnav_wrap
+              %a{ :href => "/all" } Posts &#9662;
+              %ul.subnav
+                - if session?
                   %li
                     %a{ :href => "/create" } New thread
                   %li
                     %a{ :href => "/all/creator:" + @cur_user.name } My threads
                   %li
                     %a{ :href => "/all/poster:" + @cur_user.name } Threads I posted in
+                %li
+                  %a{ :href => "/all/type:post" } Freetext posts
+                %li
+                  %a{ :href => "/all/type:image" } Image posts
+                %li
+                  %a{ :href => "/all/type:video" } Video posts
+                %li
+                  %a{ :href => "/all/type:link" } Link posts
             %li
               %a{ :href => "/chat" } Chat
             - if !session?

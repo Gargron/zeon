@@ -107,7 +107,9 @@ end
 
 ## Profiles
 get '/user/:user/?' do |user|
-  # hCard Profile
+  @user = User.first( :name => user )
+  
+  haml :"profile"
 end
 
 get '/user/:user/feed/?' do |user|
