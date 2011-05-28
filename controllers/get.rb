@@ -6,20 +6,50 @@ get '/' do
   end
 end
 
-get %r{/all(/sort:([popular|latest|oldest|updated]+))?(/page/([\d]+))?} do |o1, s, o2, p|
-  sort = { :order => :id.desc }
+get %r{/all(/type:[post|image|link|video]+)?(/[creator|poster]+:[\w]+)?(/sort:[popular|latest|oldest|updated|neglected]+)?(/page/[\d]+)?} do |r_type, r_user, r_sort, r_page|
+  # Defaults
+  default = { :order => :id.desc }
 
-  if s == "latest"
-    sort = { :order => :id.desc }
-  end
-  if s == "oldest"
-    sort = { :order => :id.asc }
-  end
-  if s == "updated"
-    sort = { :order => :updated_at.desc }
+  # Sorting
+  case r_sort.to_s.gsub(/\/sort:/, "")
+  when "latest"
+    default[:order] = :id.desc
+  when "oldest"
+    default[:order] = :id.asc
+  when "updated"
+    default[:order] = :updated_at.desc
+  when "neglected"
+    default[:order] = :updated_at.asc
   end
 
-  @posts = Activity.public.all( sort ).paginate( :page => p, :per_page => 15 )
+  # Select only by user
+  r_user = r_user.to_s.gsub(/\//, "").split(":")
+
+  case r_user[0]
+  when "creator"
+    default[:user] = { :name => r_user[1] }
+  when "poster"
+    default[:user] = { :name => r_user[1] }
+  end
+
+  # Select only by type
+  case r_type.to_s.gsub(/\/type:/, "")
+  when "post"
+    default[:type] = :post
+  when "image"
+    default[:type] = :image
+  when "link"
+    default[:type] = :link
+  when "video"
+    default[:type] = :video
+  end
+
+  # Pagination
+  unless (page = r_page.to_s.gsub(/\/page\//, "").to_i) and page > 0
+    page = 1
+  end
+
+  @posts = Activity.public.all( default ).paginate( :page => page, :per_page => 15 )
 
   @f_posts = []
   last_image = nil
