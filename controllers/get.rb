@@ -8,7 +8,7 @@ end
 
 get %r{/all(/type:[post|image|link|video]+)?(/[creator|poster]+:[\w]+)?(/sort:[popular|latest|oldest|updated|neglected]+)?(/page/[\d]+)?} do |r_type, r_user, r_sort, r_page|
   # Defaults
-  default = { :order => :id.desc }
+  default = { :type => [:post, :image, :link, :video], :parent_id => nil, :order => :id.desc }
 
   # Sorting
   case r_sort.to_s.gsub(/\/sort:/, "")
@@ -49,7 +49,7 @@ get %r{/all(/type:[post|image|link|video]+)?(/[creator|poster]+:[\w]+)?(/sort:[p
     page = 1
   end
 
-  @posts = Activity.public.all( default ).paginate( :page => page, :per_page => 15 )
+  @posts = Activity.all( default ).paginate( :page => page, :per_page => 15 )
 
   @f_posts = []
   last_image = nil
@@ -82,7 +82,6 @@ get %r{/home(/page/([\d]+))?} do |o, p|
   session!
 
   @activity = @cur_user.notifications.activities(:order => :id.desc).paginate({ :page => p, :per_page => 10})
-
   haml :dashboard
 end
 
@@ -108,7 +107,7 @@ end
 ## Profiles
 get '/user/:user/?' do |user|
   @user = User.first( :name => user )
-  
+
   haml :"profile"
 end
 

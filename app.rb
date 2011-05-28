@@ -22,15 +22,29 @@ require 'oembed_links'
 
 ## Config
 config = YAML.load_file('config.yml')
+
+## Config OEmbed
 OEmbed.register_yaml_file(Dir.pwd + "/config-oembed.yml")
+
+## Config Sinatra
 set :site_title, config['site_title']
 set :show_exceptions, TRUE
+
+## Config DataMapper
 DataMapper.setup(:default, config['mysql'])
+
+## Config Paperclip
 Paperclip.configure do |conf|
   conf.root               = Dir.pwd
   conf.env                = 'development'
   conf.use_dm_validations = true
 end
+
+## Helpers
+require 'helpers'
+
+## Config Redis
+REDIS = Redis.new :host => 'localhost', :port => 6379
 
 ## Models
 require 'models'
@@ -50,9 +64,6 @@ before do
     redirect '/'
   end
 end
-
-## Helpers
-require 'helpers'
 
 ## Controllers
 require 'controllers'

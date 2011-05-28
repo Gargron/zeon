@@ -88,10 +88,6 @@ class Activity
     end
   end
 
-  def self.public
-    all(:type => NEW_CONTENT, :parent_id => nil)
-  end
-
   def likes(cur_user)
     if likes = self.children( :type => :like, :user_id => cur_user) and likes.length > 0
       true

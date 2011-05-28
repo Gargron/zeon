@@ -140,7 +140,7 @@ post '/user/:id/:action' do |id, action|
 
   if action == "follow"
     user = User.first( :id => id )
-    if (follow = @cur_user.follows << user) and follow.saved?
+    if @cur_user.follows << user and @cur_user.save
       redirect '/home', :success => "You are now following #{user.name}"
     end
   end

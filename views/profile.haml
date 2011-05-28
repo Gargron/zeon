@@ -1,0 +1,28 @@
+%ul.breadcrumb
+  %li
+    %a{ :href => "/" } Frontpage
+  %li
+    %a{ :href => "/users" } Users
+  %li.active
+    = @user.name
+
+%div.user_profile
+  %hroup
+    %h1
+      %img.avatar{ :src => @user.avatar(80), :width => "80", :height => "80" }
+      = @user.name
+    %h2
+      - if name = @user.blob.fetch("real_name", false)
+        = name
+        &bull;
+      - if session?
+        - if @cur_user.id == @user.id
+          This is you!
+        - elsif Friendship.first( :user => @cur_user, :friend => @user )
+          Following
+        - else
+          %form.no_form{ :action => "/user/" + @user.id.to_s + "/follow", :method => "post" }
+            %button.boxed{ :type => "submit" } Follow
+      - else
+        Sign in to follow
+  %ul.user_linklist
