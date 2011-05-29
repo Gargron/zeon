@@ -1,0 +1,15 @@
+%form#settings{ :action => '/settings', :method => 'post' }
+  %fieldset
+    %legend Settings
+    %ol
+      %li
+        %label.block{ :for => 'password' } Old password:
+        %input#password.extra_large{ :name => 'password', :type => 'password' }
+      %li
+        %label.block{ :for => 'new_password' } New password:
+        %input#new_password.extra_large{ :name => 'new_password', :type => 'password' }
+      %li
+        %label.block{ :for => 'email' } E-mail:
+        %input#email.extra_large{ :name => 'email', :type => 'text', :value => @cur_user.email }
+      %li
+        %button{ :type => 'submit' } Save changes

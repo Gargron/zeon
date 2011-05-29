@@ -4,7 +4,7 @@
   %li
     %a{ :href => "/all/type:#{@item.type.to_s}" }= @item.type.to_s.capitalize
   %li.active
-    - if @item.title.empty?
+    - if @item.title.nil?
       = "#" + @item.id.to_s
     - else
       = @item.title

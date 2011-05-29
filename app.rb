@@ -43,7 +43,8 @@ end
 ## Helpers
 require 'helpers'
 
-## Config Redis
+## Constants
+ROOT = config['root']
 REDIS = Redis.new :host => 'localhost', :port => 6379
 
 ## Models

@@ -33,13 +33,13 @@
                   %li
                     %a{ :href => "/all/poster:" + @cur_user.name } Threads I posted in
                 %li
-                  %a{ :href => "/all/type:post" } Freetext posts
+                  %a{ :href => "/all/type:post" } Texties
                 %li
-                  %a{ :href => "/all/type:image" } Image posts
+                  %a{ :href => "/all/type:image" } Images
                 %li
-                  %a{ :href => "/all/type:video" } Video posts
+                  %a{ :href => "/all/type:video" } Videos
                 %li
-                  %a{ :href => "/all/type:link" } Link posts
+                  %a{ :href => "/all/type:link" } Links
             %li
               %a{ :href => "/chat" } Chat
             - if !session?
@@ -61,6 +61,12 @@
           = yield
         %aside#sidebar
           - if session?
+            %div.widget.user_greeting
+              %img.avatar{ :src => @cur_user.avatar(40), :width => "40", :height => "40" }
+              Hello,
+              %strong= @cur_user.name
+              %br
+              %a{ :href => "/settings" } Settings
             - if ann = @cur_user.notifications.activities( :type => :announcement, :limit => 1 ).first
               %div.widget.important
                 %h4

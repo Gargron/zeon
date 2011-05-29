@@ -118,4 +118,26 @@ helpers do
       url
     end
   end
+
+  def feed_title(o)
+    case o.type
+    when :post, :video, :link
+      o.title
+    when :image
+      "#" + o.id.to_s
+    end
+  end
+
+  def feed_content(o)
+    case o.type
+    when :post
+      markdown(o.content)
+    when :image
+      markdown("![](#{o.image.url(:medium)})\n\n#{o.content}")
+    when :link
+      markdown("[#{o.title}](#{o.meta["url"]})\n\n#{o.content}")
+    when :video
+      markdown("[#{o.title}](#{o.meta["video_url"]})\n\n#{o.content}").meta["video_html"]
+    end
+  end
 end

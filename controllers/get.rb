@@ -113,8 +113,53 @@ end
 
 get '/user/:user/feed/?' do |user|
   # Atom feed
+  @user = User.first( :name => user )
+  halt 404 unless @user
+  atom = Proudhon::Atom.new
+  atom.id = "http://#{ROOT}/user/#{user}/feed"
+  atom.title = @user.name
+  atom.generator = settings.site_title
+  atom.author = Proudhon::Author.new
+  atom.author.name = @user.name
+  atom.author.uri = "http://#{ROOT}/user/#{user}"
+  atom.author.links[:alternate] = "http://#{ROOT}/user/#{user}"
+  atom.author.links[:avatar] = @user.avatar
+  atom.links[:alternate] = "http://#{ROOT}/user/#{user}"
+  atom.links[:self] = "http://#{ROOT}/user/#{user}/feed"
+  atom.links[:hub] = "http://pubsubhubbub.appspot.com/"
+  atom.links[:profile] = "http://#{ROOT}/user/#{user}"
+
+  atom.entries = Activity.all( :type => [:post, :image, :video, :link], :parent_id => nil, :user => @user, :order => id.desc ).map do |a|
+    entry = Proudhon::Entry.new
+    entry.id = "http://#{ROOT}/thread/#{a.id.to_s}"
+    entry.title = feed_title(a)
+    entry.content = feed_content(a)
+    entry.updated = Time.parse(a.updated_at.to_s)
+    entry.published = Time.parse(a.created_at.to_s)
+    entry.verb = a.type
+    entry.objtype = a.type
+    entry.links[:alternate] = entry.id
+    entry
+  end
+
+  atom.to_xml
 end
 
+get '/webfinger/?' do
+  user = params[:q].to_s.gsub(/acct:/, '').split('@').first
+  finger = Proudhon::Finger.new
+  finger.subject = "acct:#{user}@#{ROOT}"
+  finger.links[:hcard] = "http://#{ROOT}/user/#{params[:q]}"
+  finger.to_xml
+end
+
+get '/.well-known/host-meta' do
+  Proudhon::HostMeta.to_xml("http://#{ROOT}/webfinger/?q={uri}")
+end
+
+get '/chat' do
+  haml :chat
+end
 
 ## Access Control
 get '/login' do
@@ -134,16 +179,16 @@ get '/reset' do
   haml :'user/reset'
 end
 
-get '/profile' do
+get '/settings' do
   session!
 
-  haml :'user/profile'
+  haml :'user/settings'
 end
 
-get '/profile/delete' do
+get '/settings/delete' do
   session!
 
-  haml :'user/profile_delete'
+  haml :'user/settings_delete'
 end
 
 get '/logout' do

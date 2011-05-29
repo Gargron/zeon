@@ -1,8 +1,0 @@
-%form#settings{ :action => '/profile', :method => 'post' }
-  %label{ :for => 'password' } Old password:
-  %input{ :name => 'password', :type => 'password', :placeholder => 'Old password' }
-  %label{ :for => 'password' } New password:
-  %input{ :name => 'new_password', :type => 'password', :placeholder => 'New password' }
-  %label{ :for => 'email' } E-mail:
-  %input{ :name => 'email', :type => 'text', :placeholder => 'E-mail', :value => @cur_user.email }
-  %button{ :type => 'submit' } Sign Up

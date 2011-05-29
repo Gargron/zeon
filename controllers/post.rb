@@ -119,7 +119,7 @@ post '/activity/:id/:action' do |id,action|
   if action == "like"
     session!
     if like = Activity.create( :parent_id => id, :user => @cur_user, :type => :like) and like.saved?
-      redirect '/thread/' + id.to_s
+      redirect '/thread/' + id.to_s, :success => "You have showed your appreciation of this thread. Thank you!"
     end
   end
   # Tag
