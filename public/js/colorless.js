@@ -31,4 +31,9 @@
       }
     }
   });
+  if(giveChat) {
+    $.getScript("http://v3.thecolorless.net:81/socket.io/socket.io.js", function() {
+      $.getScript("/js/chat.js");
+    });
+  }
 }).call(this);

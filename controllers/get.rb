@@ -129,9 +129,9 @@ get '/user/:user/feed/?' do |user|
   atom.links[:hub] = "http://pubsubhubbub.appspot.com/"
   atom.links[:profile] = "http://#{ROOT}/user/#{user}"
 
-  atom.entries = Activity.all( :type => [:post, :image, :video, :link], :parent_id => nil, :user => @user, :order => id.desc ).map do |a|
+  atom.entries = Activity.all( :type => [:post, :image, :video, :link], :parent_id => nil, :user => @user, :order => :id.desc ).map do |a|
     entry = Proudhon::Entry.new
-    entry.id = "http://#{ROOT}/thread/#{a.id.to_s}"
+    entry.id = "tag:#{ROOT};#{a.id.to_s}"
     entry.title = feed_title(a)
     entry.content = feed_content(a)
     entry.updated = Time.parse(a.updated_at.to_s)
@@ -142,19 +142,32 @@ get '/user/:user/feed/?' do |user|
     entry
   end
 
+  content_type 'application/atom+xml'
   atom.to_xml
 end
 
 get '/webfinger/?' do
-  user = params[:q].to_s.gsub(/acct:/, '').split('@').first
+  r_user = params[:id].to_s.gsub(/acct:/, '').split('@').first
+  user = User.first( :name => r_user )
   finger = Proudhon::Finger.new
-  finger.subject = "acct:#{user}@#{ROOT}"
-  finger.links[:hcard] = "http://#{ROOT}/user/#{params[:q]}"
+  finger.subject = "acct:#{user.name}@#{ROOT}"
+  finger.alias = "http://#{ROOT}/user/#{user.name}"
+  finger.links[:updates_from] = "http://#{ROOT}/user/#{user.name}/feed"
+  finger.links[:mention] = "http://#{ROOT}/salmon"
+  finger.links[:replies] = "http://#{ROOT}/salmon"
+  finger.links[:salmon] = "http://#{ROOT}/salmon"
+  finger.links[:profile] = "http://#{ROOT}/user/#{user.name}"
+  key = OpenSSL::PKey::RSA.new(user.private_key)
+  finger.links[:magic_key] = Proudhon::MagicKey.to_s(key)
+  finger.links[:hcard] = "http://#{ROOT}/user/#{user.name}"
+
+  content_type 'application/xrd+xml'
   finger.to_xml
 end
 
 get '/.well-known/host-meta' do
-  Proudhon::HostMeta.to_xml("http://#{ROOT}/webfinger/?q={uri}")
+  content_type 'application/xrd+xml'
+  Proudhon::HostMeta.to_xml("http://#{ROOT}/webfinger/?id={uri}")
 end
 
 get '/chat' do

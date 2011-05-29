@@ -62,7 +62,7 @@ GEM
     nokogiri (1.4.4)
     oembed_links (0.1.9)
       json
-    proudhon (0.1)
+    proudhon (0.1.1)
       json
       nokogiri
       rest-client

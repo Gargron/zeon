@@ -135,6 +135,33 @@ post '/activity/:id/:action' do |id,action|
   # Invite
 end
 
+post '/salmon/?' do
+  xml = CGI.unescape(request.env["rack.input"].read)
+  salmon = Proudhon::Salmon.new(xml)
+  entry = Proudhon::Entry.new(salmon.content)
+  finger = Proudhon::Finger.fetch entry.author.uri
+
+  subject = finger.subject.gsub(/acct:/, '').split('@')
+  name = subject[0]
+  domain = subject[1]
+
+  user = User.first( :name => name, :domain => domain) || User.create( :status => :remote, :name => name, :domain => domain )
+
+  case entry.verb
+  when :post
+    type = :post
+  when :reply
+    type = :reply
+  when :like
+    type = :like
+  else
+    halt 403
+  end
+
+  replyto = entry.replyto.to_s.gsub(/tag:[\w+].[\w+];/, '')
+  post = Activity.create( :user => user, :type => type, :title => entry.title, :content => entry.content, :parent_id => replyto )
+end
+
 post '/user/:id/:action' do |id, action|
   session!
 

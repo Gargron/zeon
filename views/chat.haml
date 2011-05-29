@@ -1,0 +1,17 @@
+%ul.breadcrumb
+  %li
+    %a{ :href => "/" } Frontpage
+  %li.active
+    Chat
+
+:javascript
+  var giveChat = true;
+
+%div.ribbony_thing
+  %form#chat_form{ :action => "/chat", :method => "post" }
+    %fieldset
+      %ol
+        %li
+          %textarea#chat_input{ :name => "chat_input" }
+%div.ribbony_thing
+  %div#chat_box
