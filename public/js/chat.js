@@ -4,28 +4,28 @@ var socket = new io.Socket("v3.thecolorless.net", {port: 81}),
 
 socket.connect();
 socket.on('connect', function(){
-    renderChat({message: "We are online"});
+    renderChat({content: "We are online"});
 });
 socket.on('message', function(data){
     renderChat(data);
 });
 socket.on('disconnect', function(){
-    renderChat({message: "Oh bugger, we disconnected"});
+    renderChat({content: "Oh bugger, we disconnected"});
 });
 
 speech.keydown(function(e) {
     if(e.keyCode == '13') {
         e.preventDefault();
-        var msg = { message: speech.val() };
+        var msg = { text: speech.val() };
         speech.val("");
         socket.send(msg);
-        renderChat(msg);
     }
 });
 
 var renderChat = function(data) {
     var box = $("<div>");
-        box.html((data.client ? data.client + ": " : "") + data.message);
+        box.addClass("item");
+        box.html((data.client ? '<strong class="name">' + data.client + "</strong>" : "") + (data.type == "action" ? " " + data.verb + " " : (data.client ? ": " : "")) + data.content);
 
-        chat.append(box);
+        chat.prepend(box);
 }

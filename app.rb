@@ -15,6 +15,7 @@ require 'sinatra/jsonp'
 require 'sinatra/session'
 require 'sinatra/flash'
 require 'sinatra/redirect_with_flash'
+require 'redis-store'
 require 'will_paginate'
 require 'dm-paperclip'
 require 'dm-paperclip/geometry'
@@ -27,8 +28,10 @@ config = YAML.load_file('config.yml')
 OEmbed.register_yaml_file(Dir.pwd + "/config-oembed.yml")
 
 ## Config Sinatra
+use Rack::Session::Redis, :redis_server => config['redis']
 set :site_title, config['site_title']
 set :show_exceptions, TRUE
+set :session_secret, "pomf=3"
 
 ## Config DataMapper
 DataMapper.setup(:default, config['mysql'])
@@ -59,7 +62,9 @@ else
 end
 
 before do
-  @cur_user = User.first(:id => session[:id]) if session?
+  if session?
+    @cur_user = User.first(:id => session[:id])
+  end
   if session? and !@cur_user
     session_end!
     redirect '/'

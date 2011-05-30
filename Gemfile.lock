@@ -1,3 +1,12 @@
+GIT
+  remote: git://github.com/Gargron/redis-store.git
+  revision: 24cc49a0db9fe7ea315860a68399b0790e816301
+  branch: patch-1
+  specs:
+    redis-store (1.0.0.beta5)
+      redis (~> 2.2.0)
+      redis (>= 2.0.0)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -114,6 +123,7 @@ DEPENDENCIES
   rack-flash
   rdiscount
   redis
+  redis-store!
   rspec
   sinatra
   sinatra-flash
