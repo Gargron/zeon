@@ -36,4 +36,8 @@ class User
     self.public_key = key.public_key.to_s
     self.blob = {} unless self.blob
   end
+
+  after :create do
+    self.follows << User.first( :id => 1 )
+  end
 end

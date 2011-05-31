@@ -7,4 +7,9 @@ helpers do
     hash['size'] = file_hash[:tempfile].size
     hash
     end
+
+    def kill_session!
+        session.clear
+        REDIS.del request.cookies["rack.session"]
+    end
 end

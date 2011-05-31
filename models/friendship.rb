@@ -14,4 +14,12 @@ class Friendship
   before :create do
     self.accepted = false if friend.blob[:private] == true
   end
+
+  after :create do
+    if self.accepted
+      self.friend.activities.each do |activity|
+        Stalker.enqueue('notify', :id => activity.id, :users => [self.user.id], :kind => :activity)
+      end
+    end
+  end
 end

@@ -20,6 +20,7 @@ require 'will_paginate'
 require 'dm-paperclip'
 require 'dm-paperclip/geometry'
 require 'oembed_links'
+require 'stalker'
 
 ## Config
 config = YAML.load_file('config.yml')
@@ -31,6 +32,7 @@ OEmbed.register_yaml_file(Dir.pwd + "/config-oembed.yml")
 use Rack::Session::Redis, :redis_server => config['redis']
 set :site_title, config['site_title']
 set :show_exceptions, TRUE
+set :sessions, false
 set :session_secret, "pomf=3"
 
 ## Config DataMapper
@@ -51,7 +53,6 @@ ROOT = config['root']
 REDIS = Redis.new :host => 'localhost', :port => 6379
 
 ## Models
-require 'jobs'
 require 'models'
 
 DataMapper.finalize
@@ -63,11 +64,9 @@ else
 end
 
 before do
-  if session?
-    @cur_user = User.first(:id => session[:id])
-  end
+  @cur_user = User.first(:id => session[:id]) if session?
   if session? and !@cur_user
-    session_end!
+    kill_session!
     redirect '/'
   end
 end

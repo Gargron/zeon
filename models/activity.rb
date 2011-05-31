@@ -76,23 +76,23 @@ class Activity
         self.save
 
         #notify(:mention, mentions)
-        Stalker.enqueue('notify', :id => self.id, :kind => :mention, :users => mentions)
+        Stalker.enqueue('notify', :id => self.id, :kind => :mention, :users => mentions.map { |u| u.id } )
         #notify(:group, root.group.users) if root.group
-        Stalker.enqueue('notify', :id => self.id, :kind => :group, :users => root.group.users) if root.group
+        Stalker.enqueue('notify', :id => self.id, :kind => :group, :users => root.group.users.map { |u| u.id } ) if root.group
         #notify(:tag, root.tags.users)
         #Stalker.enqueue('notify', :id => self.id, :kind => :tag, :users => root.tags.users)
       end
 
       #notify(:activity, self.user.friendships2.all(:accepted => true).users)
-      Stalker.enqueue('notify', :id => self.id, :kind => :activity, :users => self.user.friendships2.all(:accepted => true).users)
+      Stalker.enqueue('notify', :id => self.id, :kind => :activity, :users => self.user.friendships2.all(:accepted => true).users.map { |u| u.id } )
       #notify(:mine, [ root.user ])
-      Stalker.enqueue('notify', :id => self.id, :kind => :mine, :users => [root.user])
+      Stalker.enqueue('notify', :id => self.id, :kind => :mine, :users => [root.user.id])
       #notify(:bookmark, root.children(:type => :bookmark).users)
-      Stalker.enqueue('notify', :id => self.id, :kind => :bookmark, :users => root.children(:type => :bookmark).users)
+      Stalker.enqueue('notify', :id => self.id, :kind => :bookmark, :users => root.children(:type => :bookmark).users.map { |u| u.id } )
       #notify(:replied, root.children(:type => :reply).users)
-      Stalker.enqueue('notify', :id => self.id, :kind => :replied, :users => root.children(:type => :reply).users)
+      Stalker.enqueue('notify', :id => self.id, :kind => :replied, :users => root.children(:type => :reply).users.map { |u| u.id } )
       #notify(:liked, root.children(:type => :like).users)
-      Stalker.enqueue('notify', :id => self.id, :kind => :liked, :users => root.children(:type => :like).users)
+      Stalker.enqueue('notify', :id => self.id, :kind => :liked, :users => root.children(:type => :like).users.map { |u| u.id } )
     end
   end
 

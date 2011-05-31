@@ -1,4 +1,13 @@
 GIT
+  remote: git://github.com/Gargron/proudhon.git
+  revision: fa9281e9d8602f630ec1b3849ee53030613e16b4
+  specs:
+    proudhon (0.1)
+      json
+      nokogiri
+      rest-client
+
+GIT
   remote: git://github.com/Gargron/redis-store.git
   revision: 24cc49a0db9fe7ea315860a68399b0790e816301
   branch: patch-1
@@ -13,6 +22,7 @@ GEM
     activesupport (3.0.7)
     addressable (2.2.6)
     bcrypt-ruby (2.1.4)
+    beanstalk-client (1.1.0)
     data_objects (0.10.6)
       addressable (~> 2.1)
     datamapper (1.1.0)
@@ -71,10 +81,6 @@ GEM
     nokogiri (1.4.4)
     oembed_links (0.1.9)
       json
-    proudhon (0.1.1)
-      json
-      nokogiri
-      rest-client
     rack (1.3.0)
     rack-flash (0.1.1)
       rack
@@ -103,6 +109,9 @@ GEM
       sinatra (>= 0.9.1)
     sinatra-session (1.0.0)
       sinatra (>= 1.0)
+    stalker (0.9.0)
+      beanstalk-client
+      json_pure
     stringex (1.2.1)
     tilt (1.3.2)
     uuidtools (2.1.2)
@@ -119,7 +128,7 @@ DEPENDENCIES
   dm-paperclip
   haml
   oembed_links
-  proudhon
+  proudhon!
   rack-flash
   rdiscount
   redis
@@ -130,4 +139,5 @@ DEPENDENCIES
   sinatra-jsonp
   sinatra-redirect-with-flash
   sinatra-session
+  stalker
   will_paginate

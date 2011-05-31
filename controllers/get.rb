@@ -213,7 +213,7 @@ get '/settings/delete' do
 end
 
 get '/logout' do
-  session_end!
+  kill_session!
 
   redirect '/', :success => 'You\'ve been logged out.'
 end
