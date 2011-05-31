@@ -18,4 +18,5 @@ gem "rack-flash"
 gem "bcrypt-ruby", ">= 2.1.4"
 gem "dm-paperclip"
 gem "oembed_links"
+gem "stalker"
 gem 'redis-store', :git => 'git://github.com/Gargron/redis-store.git', :branch => 'patch-1'

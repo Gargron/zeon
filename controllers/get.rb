@@ -44,6 +44,8 @@ get %r{/all(/type:[post|image|link|video]+)?(/[creator|poster]+:[\w]+)?(/sort:[p
     default[:type] = :video
   end
 
+  @filter = default[:type].to_s unless r_type.nil?
+
   # Pagination
   unless (page = r_page.to_s.gsub(/\/page\//, "").to_i) and page > 0
     page = 1
@@ -78,10 +80,16 @@ get %r{/all(/type:[post|image|link|video]+)?(/[creator|poster]+:[\w]+)?(/sort:[p
   haml :index
 end
 
-get %r{/home(/page/([\d]+))?} do |o, p|
+get %r{/home(/inbox)?(/page/[\d]+)?} do |inbox, r_page|
   session!
 
-  @activity = @cur_user.notifications.activities(:order => :id.desc).paginate({ :page => p, :per_page => 10})
+  unless (page = r_page.to_s.gsub(/\/page\//, "").to_i) and page > 0
+    page = 1
+  end
+
+  @inbox = true unless inbox.nil?
+
+  @activity = @cur_user.notifications( :kind => inbox.nil? ? [ :activity, :replied, :liked, :tag, :group] : [ :message, :mention ] ).activities( :order => :id.desc ).paginate( :page => p, :per_page => 10 )
   haml :dashboard
 end
 

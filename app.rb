@@ -51,6 +51,7 @@ ROOT = config['root']
 REDIS = Redis.new :host => 'localhost', :port => 6379
 
 ## Models
+require 'jobs'
 require 'models'
 
 DataMapper.finalize

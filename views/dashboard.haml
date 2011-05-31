@@ -3,6 +3,9 @@
     %a{ :href => "/" } Frontpage
   %li.active
     Dashboard
+  - if @inbox
+    %li
+      Inbox
 
 = haml :"helpers/activity"
 = will_paginate @activity

@@ -3,6 +3,9 @@
     %a{ :href => "/" } Frontpage
   %li.active
     All
+  - if @filter
+    %li
+      = @filter.capitalize + "s"
 
 = haml :"helpers/posts"
 = will_paginate @posts
