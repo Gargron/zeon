@@ -6,5 +6,4 @@
   %span.id
     %a{ :href => "/thread/" + @item.id.to_s + "#p" + @c.id.to_s }= "#" + @c.id.to_s
   %span.time= ago(@c.created_at)
-%div.item_content.format
-  = markdown @c.content
+%div.item_content.format~ markdownit @c.content

@@ -15,5 +15,4 @@
       %dd
         %a.tt{ :href => source, :title => source, :target => "_blank", :rel => "nofollow" }= ellipse_url(source, 20)
 - if (content = @that.content and !content.empty?)
-  %blockquote.item_image_comment.format
-    = markdown content
+  %blockquote.item_image_comment.format~ markdownit content

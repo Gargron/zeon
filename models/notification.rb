@@ -14,5 +14,8 @@ class Notification
 
   after :create do
     # Dispatch to e-mail, salmon, etc
+    if self.kind == :mention
+      Stalker.enqueue('email', :a_id => :activity_id, :u_id => :user_id, :type => 'mention')
+    end
   end
 end

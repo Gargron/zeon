@@ -8,7 +8,7 @@
           %div.item_utils
             Tagged:
             - @p.tags.each do |tag|
-              %a.boxed{ :href => "/tag/" + tag.name }= tag.name
+              %a.boxed{ :href => "/all/tags:" + tag.name }= tag.name
         %div.item_meta
           %ul
             %li

@@ -45,7 +45,7 @@ class Activity
   REPLY = [ :reply, :comment ]
   SPECIFIC = [ :follow, :unfollow, :like, :vote, :tag, :attendance ]
   PRIVATE = [ :bookmark, :vote, :invitation, :poke, :recommendation, :message ]
-  MENTION = /@([a-z1-9]+)/i
+  MENTION = /(^|[\n ])@([\w]{1,30})/im
   HASHTAG = /#([a-z1-9]+)/i
   GROUPTAG = /~([a-z1-9]+)/i
 
@@ -76,7 +76,7 @@ class Activity
         self.save
 
         #notify(:mention, mentions)
-        Stalker.enqueue('notify', :id => self.id, :kind => :mention, :users => mentions.map { |u| u.id } )
+        Stalker.enqueue('notify', :id => self.id, :kind => :mention, :users => mentions.map { |u| u.id unless u.id == self.user.id } )
         #notify(:group, root.group.users) if root.group
         Stalker.enqueue('notify', :id => self.id, :kind => :group, :users => root.group.users.map { |u| u.id } ) if root.group
         #notify(:tag, root.tags.users)
@@ -117,17 +117,17 @@ class Activity
     end
   end
 
-  def substantive()
+  def substantive(cur_user_id = 0)
     unless self.parent_id.nil?
       case self.parent.type
       when :post
-        "#{parent.user.name}'s thread"
+        "#{cur_user_id == parent.user.id ? "your" : parent.user.name + "'s" } thread"
       when :link
-        "#{parent.user.name}'s link"
+        "#{cur_user_id == parent.user.id ? "your" : parent.user.name + "'s" } link"
       when :image
-        "#{parent.user.name}'s image"
+        "#{cur_user_id == parent.user.id ? "your" : parent.user.name + "'s" } image"
       when :video
-        "#{parent.user.name}'s video"
+        "#{cur_user_id == parent.user.id ? "your" : parent.user.name + "'s" } video"
       end
     else
       case self.type
@@ -146,10 +146,11 @@ class Activity
 
   def add_tags(spaced_tags)
     unless spaced_tags.empty?
-      spaced_tags = spaced_tags.scan(/[\w\s\!\(\)\&_]/).join
+      spaced_tags = spaced_tags.scan(/[\w\s\!\(\)\&]/).join
       tags = spaced_tags.downcase.split(" ")
       self.tags = tags.flatten.map { |t| Tag.first(:name => t) || Tag.create(:name => t) }
       self.save
+      Stalker.enqueue('notify', :id => self.id, :kind => :tag, :users => self.tags.users.map { |u| u.id })
     end
   end
 

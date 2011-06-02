@@ -7,4 +7,4 @@
         - if @c.type != :reply
           %div.item_tags
             - @c.tags.each do |tag|
-              %a.boxed{ :href => "/tag/" + tag.name }= tag.name
+              %a.boxed{ :href => "/all/tags:" + tag.name }= tag.name

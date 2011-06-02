@@ -3,4 +3,4 @@
     %a{ :href => "/thread/" + @that.id.to_s }= @that.title
     %small
       %a.tt{ :href => @that.meta["url"], :title => @that.meta["url"], :target => '_blank', :rel => 'nofollow' }= ellipse_url(@that.meta["url"], 80)
-  = markdown @that.content
+  ~ markdownit @that.content

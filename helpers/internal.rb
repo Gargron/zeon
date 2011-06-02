@@ -1,4 +1,9 @@
 helpers do
+    def markdownit(text)
+        html = Redcarpet.new(text, :gh_blockcode, :fenced_code, :safelink, :filter_html, :strikethrough).to_html
+        html.gsub(/(^|[\n ])@([\w]{1,30})/im, "\\1@<a href=\"/user/\\2\">\\2</a>")
+    end
+
     def paper_hash(file_hash)
     hash = Hash.new
     hash['tempfile'] = file_hash[:tempfile]
@@ -12,4 +17,5 @@ helpers do
         session.clear
         REDIS.del request.cookies["rack.session"]
     end
+
 end

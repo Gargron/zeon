@@ -1,4 +1,4 @@
 %div.format
   %h2
     %a{ :href => "/thread/" + @that.id.to_s }= @that.title
-  = markdown @that.content
+  ~ markdownit @that.content

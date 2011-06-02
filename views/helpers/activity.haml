@@ -9,7 +9,7 @@
             %img.avatar{ :src => @a.user.avatar(48), :width => "48", :height => "48" }
             %span.name= you(@a.user.name)
           %span.verb= @a.verb
-          %a.object{ :href => "/thread/" + this.id.to_s }= @a.substantive
+          %a.object{ :href => "/thread/" + this.id.to_s }= @a.substantive(@cur_user.name)
         %div.item_content
           - if not [:reply, :like].include? @a.type
             = haml :"helpers/activity_#{@a.type.to_s}"
@@ -29,7 +29,9 @@
               %li
                 Tagged:
                 - this.tags.each do |tag|
-                  %a.boxed{ :href => "/tag/" + tag.name }= tag.name
+                  %a.boxed{ :href => "/all/tags:" + tag.name }= tag.name
             - else
               %li
                 %a.boxed{ :href => goto(@a.parent_id, @a.id, 20) } View in context
+              %li
+                = (@a.parent.title || "#" + @a.parent.id.to_s)

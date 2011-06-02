@@ -57,7 +57,11 @@ helpers do
   end
 
   def goto(parent_id, post_id, per_page)
-    count = Activity.first(:id => parent_id).children(:type => :reply, :id.lt => post_id).count
+    if !parent_id.nil? && !post_id.nil?
+      count = Activity.first(:id => parent_id).children(:type => :reply, :id.lt => post_id).count
+    else
+      count = 1
+    end
     page  = (count / per_page).floor + 1
     if page == 1
       "/thread/" + parent_id.to_s + "#p" + post_id.to_s

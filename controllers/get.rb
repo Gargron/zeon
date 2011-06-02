@@ -6,7 +6,7 @@ get '/' do
   end
 end
 
-get %r{/all(/type:[post|image|link|video]+)?(/[creator|poster]+:[\w]+)?(/sort:[popular|latest|oldest|updated|neglected]+)?(/page/[\d]+)?} do |r_type, r_user, r_sort, r_page|
+get %r{/all(/type:[post|image|link|video]+)?(/tags:[\w!&+~-]+)?(/[creator|poster]+:[\w]+)?(/sort:[popular|latest|oldest|updated|neglected]+)?(/page/[\d]+)?} do |r_type, r_tags, r_user, r_sort, r_page|
   # Defaults
   default = { :type => [:post, :image, :link, :video], :parent_id => nil, :order => :id.desc }
 
@@ -51,7 +51,30 @@ get %r{/all(/type:[post|image|link|video]+)?(/[creator|poster]+:[\w]+)?(/sort:[p
     page = 1
   end
 
-  @posts = Activity.all( default ).paginate( :page => page, :per_page => 15 )
+  # Select by tags
+  tags = r_tags.to_s.gsub(/\/tags:/, "")
+  all_tags = tags.split(/\+~-/)
+
+  include_tags = []
+  exclude_tags = []
+  maybe_tags = []
+
+  # Parse tag query
+  tags.scan(/([+|\-|~])?([\w&!]+)/i) { |op, tag|
+    if op.nil? or op == '+'
+      include_tags.push tag
+    elsif op == '-'
+      exclude_tags.push tag
+    elsif op == '~'
+      maybe_tags.push tag
+    end
+  }
+
+  if all_tags.length > 0
+    @posts = ((Tag.all( :name => include_tags).activities( default ) - Tag.all( :name => exclude_tags).activities( default )) | Tag.all( :name => maybe_tags).activities( default )).paginate( :page => page, :per_page => 15 )
+  else
+    @posts = Activity.all( default ).paginate( :page => page, :per_page => 15 )
+  end
 
   @f_posts = []
   last_image = nil
@@ -89,7 +112,8 @@ get %r{/home(/inbox)?(/page/[\d]+)?} do |inbox, r_page|
 
   @inbox = true unless inbox.nil?
 
-  @activity = @cur_user.notifications( :kind => inbox.nil? ? [ :activity, :replied, :liked, :tag, :group] : [ :message, :mention ] ).activities( :order => :id.desc ).paginate( :page => p, :per_page => 10 )
+  @activity = @cur_user.notifications( :kind => inbox.nil? ? [ :activity, :mine, :replied, :liked, :tag, :group] : [ :message, :mention ] ).activities( :order => :id.desc ).paginate( :page => p, :per_page => 10 )
+  #@activity = REDIS.zrevrange("notifications:#{(@inbox ? "inbox" : "home")}:#{@cur_user.id}", 0, -1).map { |o| JSON.parse(o) }.paginate( :page => p, :per_page => 10 )
   haml :dashboard
 end
 

@@ -23,7 +23,7 @@
         %dd= @c.image_dimensions + " (" + megapixels(@c.image_dimensions).to_s + " MP)"
   %li.item_content
     - if (content = @c.content) and not content.empty?
-      %div.format= markdown content
+      %div.format~ markdownit content
     %div.item_meta
       %a.tt{ :href => "/user/" + @c.user.name, :title => (@c.user.blob['real_name'] || nil) }
         %img.avatar{ :src => @c.user.avatar(48), :width => "48", :height => "48" }

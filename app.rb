@@ -2,6 +2,7 @@ require 'rubygems'
 require 'bundler/setup'
 require 'sinatra'
 require 'haml'
+require 'sass'
 require 'datamapper'
 require 'openssl'
 require 'redis'
@@ -10,6 +11,8 @@ require 'proudhon'
 require 'yaml'
 require 'fileutils'
 require 'uri'
+require 'json'
+require 'hashie'
 
 require 'sinatra/jsonp'
 require 'sinatra/session'
@@ -21,6 +24,7 @@ require 'dm-paperclip'
 require 'dm-paperclip/geometry'
 require 'oembed_links'
 require 'stalker'
+require 'redcarpet'
 
 ## Config
 config = YAML.load_file('config.yml')
@@ -34,6 +38,8 @@ set :site_title, config['site_title']
 set :show_exceptions, TRUE
 set :sessions, false
 set :session_secret, "pomf=3"
+
+Tilt.register 'markdown', Tilt::RedcarpetTemplate
 
 ## Config DataMapper
 DataMapper.setup(:default, config['mysql'])

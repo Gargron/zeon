@@ -1,5 +1,8 @@
-#chat-input
-  height: 50px
+#chat_input
+  min-height: 24px
+
+#chat_form
+  margin-bottom: 1.5em
 
 #chat_box
   overflow: hidden
@@ -7,5 +10,54 @@
   height: 500px
   .item
     display: block
+    width: 590px
+    clear: both
+    margin: .5em 0
     strong.name
-      font-weight: bold
+      font-weight: normal
+    &.item_status, &.item_action, strong.name
+      font-family: Consolas,"Bitstream Vera Sans Mono","Andale Mono",Monaco,"DejaVu Sans Mono","Lucida Console",monospace
+      color: #aaa
+    &.item_action
+      color: #fff
+      .item_meta
+        display: inline
+        img
+          display: none
+      .item_bubble
+        display: inline
+    &.item_message
+      +clearfix
+      margin: 1em 0
+      .item_meta
+        width: 44px
+        float: left
+        text-align: center
+        img
+          display: block
+          border: 4px solid #333
+          box-shadow: 0 0 4px rgba(0, 0, 0, 0.4)
+        strong.name
+          font-size: 13px
+      .item_bubble
+        float: left
+        width: 494px
+        left: 20px
+        color: #fff
+        background: #333
+        border-radius: 5px
+        border: 1px solid #000
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.6), inset 0 0 10px 10px rgba(80, 80, 80, 0.3)
+        padding: 10px
+        position: relative
+        &:after
+          display: block
+          content: ' '
+          position: absolute
+          border-color: transparent #333 transparent transparent
+          border-style: solid
+          border-width: 10px
+          width: 0
+          height: 0
+          left: -20px
+          top: 33.3%
