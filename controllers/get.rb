@@ -70,7 +70,7 @@ get %r{/all(/type:[post|image|link|video]+)?(/tags:[\w!&+~-]+)?(/[creator|poster
     end
   }
 
-  if all_tags.length > 0
+  if all_tags.length > 0 && all_tags <= 7
     @posts = ((Tag.all( :name => include_tags).activities( default ) - Tag.all( :name => exclude_tags).activities( default )) | Tag.all( :name => maybe_tags).activities( default )).paginate( :page => page, :per_page => 15 )
   else
     @posts = Activity.all( default ).paginate( :page => page, :per_page => 15 )

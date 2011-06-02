@@ -12,7 +12,6 @@ require 'yaml'
 require 'fileutils'
 require 'uri'
 require 'json'
-require 'hashie'
 
 require 'sinatra/jsonp'
 require 'sinatra/session'
@@ -35,9 +34,12 @@ OEmbed.register_yaml_file(Dir.pwd + "/config-oembed.yml")
 ## Config Sinatra
 use Rack::Session::Redis, :redis_server => config['redis']
 set :site_title, config['site_title']
-set :show_exceptions, TRUE
+set :environment, config['env']
+if config['env'] == 'development'
+  set :show_exceptions, TRUE
+end
 set :sessions, false
-set :session_secret, "pomf=3"
+set :session_secret, config['secret']
 
 Tilt.register 'markdown', Tilt::RedcarpetTemplate
 
@@ -47,7 +49,7 @@ DataMapper.setup(:default, config['mysql'])
 ## Config Paperclip
 Paperclip.configure do |conf|
   conf.root               = Dir.pwd
-  conf.env                = 'development'
+  conf.env                = config['env']
   conf.use_dm_validations = true
 end
 
