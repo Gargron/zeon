@@ -148,18 +148,14 @@ post '/salmon/?' do
   user = User.first( :name => name, :domain => domain) || User.create( :status => :remote, :name => name, :domain => domain )
 
   case entry.verb
-  when :post
-    type = :post
-  when :reply
-    type = :reply
-  when :like
-    type = :like
-  else
-    halt 403
+  when :post, :reply, :like
+    type = entry.verb
+    replyto = entry.replyto.to_s.gsub(/tag:[\w+].[\w+];/, '')
+    post = Activity.create( :user => user, :type => type, :title => entry.title, :content => entry.content, :parent_id => replyto )
+  when :follow
+    #user.follows << entry
   end
 
-  replyto = entry.replyto.to_s.gsub(/tag:[\w+].[\w+];/, '')
-  post = Activity.create( :user => user, :type => type, :title => entry.title, :content => entry.content, :parent_id => replyto )
 end
 
 post '/user/:id/:action' do |id, action|

@@ -136,6 +136,10 @@ get '/style/style.css' do
   sass :"sass/style", :load_paths => [ File.dirname(__FILE__) + '/views' ]
 end
 
+get '/follow' do
+  haml :"user/follow"
+end
+
 ## Profiles
 get '/user/:user/?' do |user|
   @user = User.first( :name => user )

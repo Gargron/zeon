@@ -10,11 +10,14 @@ The 'federated' part means that users on a certain Zeon instance can communicate
 
 ## Dependencies
 
-We provide a Gemspec file, so all you need to get the ball rolling is to
+Software:
+
+* A [Redis](http://redio.io) server for sessions and caching
+* [Beanstalkd](http://kr.github.com/beanstalkd/) for queued jobs such as notifications, e-mails et cetera
+
+Gems: We provide a Gemspec file, so all you need to get the ball rolling is to
 
     bundle install
-
-For caching support a Redis server is required.
 
 ## What it can do
 
@@ -25,3 +28,9 @@ For caching support a Redis server is required.
   * Federation: even if the user followed is on another server
 * Users have personalized home feeds
   * Federation: including posts from followed people on other servers
+
+## Progress
+
+* Creating of activities, replying, tagging, following, liking, browsing tags and other filtering are done
+* Editing and deletion are not done
+* Federation is not done
