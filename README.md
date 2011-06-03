@@ -8,6 +8,19 @@ Our strategy is to use caching and background workers to allow for non-blocking 
 
 The 'federated' part means that users on a certain Zeon instance can communicate with users on another instance. This is achieved using a protocol suite called OStatus, and it also allows us to communicate with other OStatus applications, including blogs and other social networks. For our OStatus needs we're using a gem called Proudhon.
 
+## Configuration
+
+You need to create a `config.yml` file in your app's directory. This is an example of the file:
+
+    mysql: mysql://root@localhost/zeon
+    redis: redis://localhost:6379/0
+    root: domain.com
+    site_title: Zeon
+    env: development
+    secret: verysecretphraseforsessions
+    migrate: true
+    chat: false
+
 ## Dependencies
 
 Software:
