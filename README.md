@@ -21,6 +21,8 @@ You need to create a `config.yml` file in your app's directory. This is an examp
     migrate: true
     chat: false
 
+You also need to create a public/uploads folder and chmod it to 777 recursively for image uploads.
+
 ## Dependencies
 
 Software:
@@ -55,6 +57,9 @@ Gems: We provide a Gemspec file, so all you need to get the ball rolling is to
 * Currently the design for this is branded, a default neutral theme will be used instead when most of the project is finished
 * The chat is an optional module and will be treated as such in the future (disabling/enabling)
   * The chat also requires a node.js server
+  * And following npm modules:
+    * socket.io
+    * redis
 * Any development help would be very appreciated
 
 ## Development

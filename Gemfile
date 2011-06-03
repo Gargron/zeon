@@ -7,7 +7,6 @@ gem "activesupport"
 gem "datamapper", ">= 1.1.0"
 gem "dm-mysql-adapter"
 gem "redis"
-gem "hashie"
 gem "proudhon", :git => 'git://github.com/Gargron/proudhon.git'
 gem "sinatra-jsonp"
 gem "sinatra-session"

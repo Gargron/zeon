@@ -1,5 +1,4 @@
-var fugue = require('fugue'),
-    http = require('http'),
+var http = require('http'),
     redis_server = require('redis'),
     redis_client = redis_server.createClient(),
     sys = require('sys'),
@@ -7,8 +6,8 @@ var fugue = require('fugue'),
     crypto = require('crypto'),
 
 server = http.createServer(function(req, res){
-  res.writeHead(200, {'Content-Type': 'text/html'});
-  res.end('<h1>Hello world</h1>');
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end(';)');
 });
 
 server.listen(81);
@@ -19,8 +18,6 @@ redis_client.on("error", function (err) {
 
 // socket.io
 var socket = io.listen(server);
-
-//fugue.start(server, 81, null, 1, {verbose : true});
 
 socket.on('connection', function(client){
   var user = {},
