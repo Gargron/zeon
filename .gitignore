@@ -1,7 +1,10 @@
 .DS_Store
 .sass_cache
+.bundle
 snippets.txt
 tmp
 log
 config.yml
+vendor
+node_modules
 public/uploads/*

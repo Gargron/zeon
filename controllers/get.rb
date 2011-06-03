@@ -144,6 +144,10 @@ end
 get '/user/:user/?' do |user|
   @user = User.first( :name => user )
 
+  unless @user
+    halt 404
+  end
+
   haml :"profile"
 end
 
@@ -207,6 +211,7 @@ get '/.well-known/host-meta' do
 end
 
 get '/chat' do
+  halt 404 unless settings.chat
   haml :chat
 end
 

@@ -1,0 +1,18 @@
+%ul.breadcrumb
+  %li
+    %a{ :href => "/" } Frontpage
+  %li
+    Users
+  %li
+    Follow remote user
+
+%form{ :action => "/follow", :method => "post" }
+  %fieldset
+    %ol
+      %li
+        %label.block{ :for => "user_id" }
+          User ID
+          %em.pretty_italic For example acct:bob@example.com or example.com/bob
+        %input#user_id.extra_large{ :type => "text", :name => "user_id" }
+      %li
+        %button{ :type => "submit" } Follow

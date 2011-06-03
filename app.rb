@@ -35,11 +35,10 @@ OEmbed.register_yaml_file(Dir.pwd + "/config-oembed.yml")
 use Rack::Session::Redis, :redis_server => config['redis']
 set :site_title, config['site_title']
 set :environment, config['env']
-if config['env'] == 'development'
-  set :show_exceptions, TRUE
-end
+set :show_exceptions, TRUE if config['env'] == 'development'
 set :sessions, false
 set :session_secret, config['secret']
+set :chat, config['chat']
 
 Tilt.register 'markdown', Tilt::RedcarpetTemplate
 
