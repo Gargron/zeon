@@ -14,12 +14,13 @@ Software:
 
 * A [Redis](http://redio.io) server for sessions and caching
 * [Beanstalkd](http://kr.github.com/beanstalkd/) for queued jobs such as notifications, e-mails et cetera
+* ImageMagick
 
 Gems: We provide a Gemspec file, so all you need to get the ball rolling is to
 
     bundle install
 
-## What it can do
+## What it can do (when it's ready)
 
 * Users can post freetext, image, video and link posts
 * Users can reply to them, like them
@@ -31,6 +32,21 @@ Gems: We provide a Gemspec file, so all you need to get the ball rolling is to
 
 ## Progress
 
-* Creating of activities, replying, tagging, following, liking, browsing tags and other filtering are done
-* Editing and deletion are not done
-* Federation is not done
+* Creating of activities, replying, tagging, following, liking, browsing tags and other filtering are **done**
+* Editing and deletion are **not done**
+* Federation is **not done**
+* Design of profiles is **not done**
+
+## Other notes
+
+* Currently the design for this is branded, a default neutral theme will be used instead when most of the project is finished
+* The chat is an optional module and will be treated as such in the future (disabling/enabling)
+  * The chat also requires a node.js server
+* Any development help would be very appreciated
+
+## Development
+
+* Contribute if you can/want to, I will review your pull request and most likely accept
+* Any help is appreciated
+* As of now I am developing it alone
+  * My gTalk is gargron [at] gmail.com and so is my MSN and e-mail
