@@ -18,7 +18,7 @@ if (typeof io === "undefined") {
     socket.connect = function() {}, socket.on = function() {}, socket.send = function() {};
     renderChat({type: "status", content: "Chat is not available, sorry bro"});
 } else {
-    socket = new io.Socket("v3.thecolorless.net", {port: 81})
+    socket = new io.Socket(root, {port: 81})
 }
 
 socket.connect();
