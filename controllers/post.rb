@@ -37,7 +37,7 @@ post '/activity' do
         redirect '/create', :error => "That 'URL' you got there wasn't a valid URL!"
       end
       video_html = nil
-      if (oembed = OEmbed.valid? params[:url])
+      if (oembed = OEmbed.valid? (params[:url], "maxwidth" => "600", "maxheight" => "350"))
         video_html = oembed.to_s
       else
         redirect '/create', :error => "Sorry, we currently support only Youtube, Vimeo, Hulu and Viddler"
