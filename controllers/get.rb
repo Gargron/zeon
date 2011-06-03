@@ -246,7 +246,7 @@ get '/settings/delete' do
 end
 
 get '/logout' do
-  kill_session!
+  session_end!
 
   redirect '/', :success => 'You\'ve been logged out.'
 end

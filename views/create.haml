@@ -10,7 +10,7 @@
           %a.video{ :href => "#", :data => { :value => "video" } } Video
           %a.link{ :href => "#", :data => { :value => "link" } } Link
         %input#type{ :type => "hidden", :name => "type", :value => "post" }
-      %li
+      %li.message_holder
         = haml :"helpers/error"
       %li.title.active
         %label.block{ :for => "title" }

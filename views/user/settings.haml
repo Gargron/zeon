@@ -2,6 +2,8 @@
   %fieldset
     %legend Settings
     %ol
+      %li.message_holder
+        = haml :"helpers/error"
       %li
         %label.block{ :for => 'password' } Old password:
         %input#password.extra_large{ :name => 'password', :type => 'password' }

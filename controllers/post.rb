@@ -158,12 +158,52 @@ post '/salmon/?' do
 
 end
 
+post '/follow' do
+  session!
+
+  finger = Proudhon::Finger.fetch params[:user_id]
+
+  unless !finger.nil?
+    raise "Couldn't finger the user's feed"
+  end
+
+  feed = finger.links[:updates_from]
+  subject = finger.subject.gsub(/acct:/, '').split('@')
+  name = subject[0]
+  domain = subject[1]
+
+  user = User.first( :name => name, :domain => domain) || User.create( :status => :remote, :name => name, :domain => domain, :meta => { 'remote_url' => feed } )
+
+  if user.id == @cur_user.id
+    redirect '/follow', :error => "Cannot follow self. It's like dividing by zero in an unobserved room."
+  end
+
+  if @cur_user.does_follow user
+    redirect '/follow', :error => "Already following #{name}"
+  end
+
+  @cur_user.follows << user
+  @cur_user.save
+
+  unless @cur_user.saved?
+    redirect '/follow', :error => "Dammit, there was a problem following #{name}"
+  end
+
+  if user.domain != ROOT
+    "remote is not supported completely yet"
+    atom = Proudhon::Atom.from_uri feed
+    atom.subscribe
+  end
+end
+
 post '/user/:id/:action' do |id, action|
   session!
 
   if action == "follow"
     user = User.first( :id => id )
-    if @cur_user.follows << user and @cur_user.save
+    @cur_user.follows << user
+    @cur_user.save
+    if @cur_user.saved?
       redirect '/home', :success => "You are now following #{user.name}"
     end
   end

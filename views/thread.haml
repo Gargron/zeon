@@ -18,7 +18,7 @@
   %form#reply.notabox{ :action => "/activity/" + @item.id.to_s + "/reply", :method => "post" }
     %fieldset
       %ol
-        %li= haml :"helpers/error"
+        %li.message_holder= haml :"helpers/error"
         %li
           %label.block{ :for => "content" } Reply:
           %textarea#content{ :name => "content" }

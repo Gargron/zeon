@@ -9,6 +9,8 @@
 %form{ :action => "/follow", :method => "post" }
   %fieldset
     %ol
+      %li.message_holder
+        = haml :"helpers/error"
       %li
         %label.block{ :for => "user_id" }
           User ID

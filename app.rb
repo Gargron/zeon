@@ -32,11 +32,9 @@ config = YAML.load_file('config.yml')
 OEmbed.register_yaml_file(Dir.pwd + "/config-oembed.yml")
 
 ## Config Sinatra
-use Rack::Session::Redis, :redis_server => config['redis']
 set :site_title, config['site_title']
 set :environment, config['env']
 set :show_exceptions, TRUE if config['env'] == 'development'
-set :sessions, false
 set :session_secret, config['secret']
 set :chat, config['chat']
 
@@ -73,7 +71,7 @@ end
 before do
   @cur_user = User.first(:id => session[:id]) if session?
   if session? and !@cur_user
-    kill_session!
+    session_end!
     redirect '/'
   end
 end

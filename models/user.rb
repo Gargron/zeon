@@ -30,6 +30,14 @@ class User
     "http://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(email)}?s=#{size}"
   end
 
+  def feed_url
+    self.status != :remote ? "/user/#{self.name}/feed" : self.blob.fetch("remote_url", "")
+  end
+
+  def does_follow(user)
+    self.follows.include? user
+  end
+
   before :create do
     key = OpenSSL::PKey::RSA::generate(512)
     self.private_key = key.to_s
