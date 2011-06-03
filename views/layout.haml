@@ -5,6 +5,9 @@
     %title= settings.site_title
     %link{ :href => 'http://fonts.googleapis.com/css?family=Lobster', :rel => 'stylesheet', :type => 'text/css' }
     %link{ :rel => "stylesheet", :href => "/style/style.css", :type => "text/css" }/
+    :javascript
+      var root = "#{ROOT}",
+          giveChat;
   %body{ :lang => "en" }
     #wrapper
       %header#header
@@ -57,6 +60,11 @@
               %img#logo{ :src => "/images/cl_logo.png", :width => "70", :height => "70" }
               The
               %strong Colorless
+      %aside#message_b
+        - if !flash[:error_b].nil?
+          %div.message.error= flash[:error_b]
+        - if !flash[:success_b].nil?
+          %div.message.success= flash[:success_b]
       %article#main
         %div#container
           = yield
@@ -107,7 +115,6 @@
     %script{ :src => "http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" }
     :javascript
       !window.jQuery && document.write(unescape('%3Cscript src="js/jquery.min.js"%3E%3C/script%3E'))
-      var root = "#{ROOT}";
     %script{ :src => "/js/plugins/jquery.showpassword.min.js" }
     %script{ :src => "/js/plugins/jquery.tipTip.minified.js" }
     %script{ :src => "/js/colorless.js" }

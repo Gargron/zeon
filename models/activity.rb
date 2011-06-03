@@ -18,8 +18,8 @@ class Activity
   belongs_to :parent, :model => 'Activity', :required => false
   belongs_to :group, :required => false
 
-  has n, :children, :model => 'Activity', :child_key => [ :parent_id ]
-  has n, :notifications
+  has n, :children, :model => 'Activity', :child_key => [ :parent_id ], :constraint => :destroy
+  has n, :notifications, :constraint => :destroy
   has n, :tags, :through => Resource, :constraint => :destroy
 
   has_attached_file :image,
