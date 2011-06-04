@@ -171,6 +171,12 @@ post '/salmon/?' do
 
 end
 
+post '/pubsub/?' do
+  xml = CGI.unescape(request.env["rack.input"].read)
+
+  xml.inspect
+end
+
 post '/follow' do
   session!
 
@@ -203,9 +209,8 @@ post '/follow' do
   end
 
   if user.domain != ROOT
-    "remote is not supported completely yet"
     atom = Proudhon::Atom.from_uri feed
-    atom.subscribe
+    atom.subscribe "http://{ROOT}/pubsub"
   end
 end
 

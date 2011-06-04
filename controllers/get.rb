@@ -210,6 +210,13 @@ get '/.well-known/host-meta' do
   Proudhon::HostMeta.to_xml("http://#{ROOT}/webfinger/?id={uri}")
 end
 
+get '/pubsub' do
+  topic = params['hub.topic']
+  mode = params['hub.mode']
+
+  params['hub.challenge']
+end
+
 get '/chat' do
   halt 404 unless settings.chat
   haml :chat
