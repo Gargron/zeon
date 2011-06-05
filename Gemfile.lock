@@ -1,8 +1,8 @@
 GIT
   remote: git://github.com/Gargron/proudhon.git
-  revision: fa9281e9d8602f630ec1b3849ee53030613e16b4
+  revision: 70f77c616217454016d0c995104ace3e47ce37bd
   specs:
-    proudhon (0.1)
+    proudhon (0.1.5.5)
       json
       nokogiri
       rest-client
@@ -83,14 +83,14 @@ GEM
     rack (1.3.0)
     rack-flash (0.1.1)
       rack
-    redcarpet (1.14.2)
+    redcarpet (1.15.2)
     redis (2.2.0)
-    rest-client (1.6.1)
+    rest-client (1.6.3)
       mime-types (>= 1.16)
     sass (3.1.2)
     sinatra (1.2.6)
       rack (~> 1.1)
-      tilt (< 2.0, >= 1.2.2)
+      tilt (>= 1.2.2, < 2.0)
     sinatra-flash (0.3.0)
       sinatra (>= 1.0.0)
     sinatra-jsonp (0.3.1)

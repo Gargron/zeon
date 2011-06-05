@@ -156,7 +156,7 @@ get '/user/:user/feed/?' do |user|
   @user = User.first( :name => user )
   halt 404 unless @user
   atom = Proudhon::Atom.new
-  atom.id = "http://#{ROOT}/user/#{user}/feed"
+  atom.id = "tag:#{ROOT};feed:#{@user.id}"
   atom.title = @user.name
   atom.generator = settings.site_title
   atom.author = Proudhon::Author.new
@@ -171,14 +171,26 @@ get '/user/:user/feed/?' do |user|
 
   atom.entries = Activity.all( :type => [:post, :image, :video, :link], :parent_id => nil, :user => @user, :order => :id.desc ).map do |a|
     entry = Proudhon::Entry.new
-    entry.id = "tag:#{ROOT};#{a.id.to_s}"
-    entry.title = feed_title(a)
-    entry.content = feed_content(a)
+    entry.id = "tag:#{ROOT};activity:#{a.id.to_s}"
+    entry.title = a.title
+    entry.content = a.content
     entry.updated = Time.parse(a.updated_at.to_s)
     entry.published = Time.parse(a.created_at.to_s)
     entry.verb = a.type
     entry.objtype = a.type
-    entry.links[:alternate] = entry.id
+    entry.links[:alternate] = "http://#{ROOT}/thread/#{a.id.to_s}"
+    case a.type
+    when :image
+      entry.links[:preview] = a.image.url(:thumb_all)
+      entry.links[:enclosure] = a.image.url
+    end
+    webpage = Proudhon::Annotation.new
+    #webpage.type = "webpage"
+    webpage.attributes = Proudhon::Attributes.new
+    webpage.attributes.attributes << Proudhon::Attribute.new
+    webpage.attributes.attributes.first.name = "url"
+    webpage.attributes.attributes.first.value = a.meta.fetch("url", false) || a.meta.fetch("video_url", false) || a.meta.fetch("source_url", "")
+    entry.annotations << webpage
     entry
   end
 

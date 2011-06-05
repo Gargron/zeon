@@ -173,8 +173,14 @@ end
 
 post '/pubsub/?' do
   xml = CGI.unescape(request.env["rack.input"].read)
+  atom = Proudhon::Atom.parse xml
 
-  REDIS.set "pubsubpost", xml
+  atom.entries.each do |entry|
+    uri = URI.parse atom.author.uri
+    user = User.first( :name => atom.author.name, :domain => uri.host )
+    activity = Activity.create( :type => entry.objtype, :title => entry.title, :content => entry.content, :user => user )
+  end
+
 end
 
 post '/follow' do
