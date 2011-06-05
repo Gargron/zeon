@@ -2,11 +2,6 @@
   - @conversation.each do |@c|
     - if [:post, :image, :video, :link, :reply].include? @c.type
       %li.item{ :class => "item_" + @c.type.to_s, :id => "p" + @c.id.to_s }
-        - if session? and @cur_user.id == @c.user.id
-          %div.item_controls
-            %a.boxed{ :href => "/edit/#{@c.id.to_s}" } Edit
-            %form.no_form{ :action => "/activity/#{@c.id.to_s}/delete", :method => "post" }
-              %button.boxed.delete{ :type => "submit" } Delete
         %div.item_specific
           = haml :"helpers/conversation_#{@c.type.to_s}"
         - if @c.type != :reply

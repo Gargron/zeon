@@ -22,6 +22,11 @@
         %dt Dimensions:
         %dd= @c.image_dimensions + " (" + megapixels(@c.image_dimensions).to_s + " MP)"
   %li.item_content
+    - if session? and @cur_user.id == @c.user.id
+      %div.item_controls
+        %a.boxed{ :href => "/edit/#{@c.id.to_s}" } Edit
+        %form.no_form{ :action => "/activity/#{@c.id.to_s}/delete", :method => "post" }
+          %button.boxed.delete{ :type => "submit" } Delete
     - if (content = @c.content) and not content.empty?
       %div.format~ markdownit content
     %div.item_meta

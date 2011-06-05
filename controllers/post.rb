@@ -9,7 +9,7 @@ post '/activity' do
     if !params[:title].empty? and !params[:text].empty?
       if freetext = Activity.create( :title => params[:title], :type => :post, :content => params[:text], :user => @cur_user ) and freetext.saved?
         freetext.add_tags(params[:tags])
-        redirect '/thread/' + freetext.id.to_s, :success_b => "Created!"
+        redirect '/thread/' + freetext.id.to_s
       else
         redirect '/create', :error => freetext.errors.to_a.join(' - ')
       end
@@ -27,7 +27,7 @@ post '/activity' do
     dimensions = Paperclip::Geometry.from_file(params[:image_file][:tempfile])
     if image = Activity.create( :type => :image, :user => @cur_user, :content => params[:text], :meta => params[:url].empty? ? {} : { :source_url => params[:url] }, :image => paper_hash(params[:image_file]), :image_dimensions => dimensions.width.round.to_s + "x" + dimensions.height.round.to_s ) and image.saved?
       image.add_tags(params[:tags])
-      redirect '/thread/' + image.id.to_s, :success_b => "Created!"
+      redirect '/thread/' + image.id.to_s
     else
       redirect '/create', :error => image.errors.to_a.join(' - ')
     end
@@ -44,7 +44,7 @@ post '/activity' do
       end
       if video = Activity.create( :type => :video, :user => @cur_user, :title => params[:title], :content => params[:text], :meta => { :video_url => params[:url], :video_html => video_html } ) and video.saved?
         video.add_tags(params[:tags])
-        redirect '/thread/' + video.id.to_s, :success_b => "Created!"
+        redirect '/thread/' + video.id.to_s
       else
         redirect '/create', :error => video.errors.to_a.join(' - ')
       end
@@ -57,7 +57,7 @@ post '/activity' do
       if !(params[:url] =~ URI::regexp).nil?
         if link = Activity.create( :type => :link, :user => @cur_user, :title => params[:title], :content => params[:text], :meta => { :url => params[:url] } ) and link.saved?
           link.add_tags(params[:tags])
-          redirect '/thread/' + link.id.to_s, :success_b => "Created!"
+          redirect '/thread/' + link.id.to_s
         else
           redirect '/create', :error => link.errors.to_a.join(' - ')
         end
@@ -87,9 +87,9 @@ post '/activity/:id/delete' do |id|
 
   # Delete Activity
   if a.destroy
-    redirect '/home', :success_b => "Deleted ##{a.id}"
+    redirect '/home'
   else
-    redirect back, :error_b => "Error deleting ##{a.id}"
+    redirect back
   end
 end
 
@@ -132,7 +132,7 @@ post '/activity/:id/:action' do |id,action|
   if action == "like"
     session!
     if like = Activity.create( :parent_id => id, :user => @cur_user, :type => :like) and like.saved?
-      redirect '/thread/' + id.to_s, :success_b => "You have showed your appreciation of this thread. Thank you!"
+      redirect '/thread/' + id.to_s
     end
   end
   # Tag
@@ -174,7 +174,7 @@ end
 post '/pubsub/?' do
   xml = CGI.unescape(request.env["rack.input"].read)
 
-  xml.inspect
+  REDIS.set "pubsubpost", xml
 end
 
 post '/follow' do

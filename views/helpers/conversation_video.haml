@@ -4,9 +4,14 @@
     %a.tt{ :href => @c.meta["video_url"], :title => @c.meta["video_url"], :target => '_blank', :rel => 'nofollow' }= ellipse_url(@c.meta["video_url"], 60)
 - if @c.meta.has_key? "video_html"
   =  @c.meta["video_html"]
-- if (content = @c.content) and not content.empty?
-  %div.format
-    = markdown content
+%div.item_content
+  - if (content = @c.content) and not content.empty?
+    %div.format~ markdown content
+  - if session? and @cur_user.id == @c.user.id
+    %div.item_controls
+      %a.boxed{ :href => "/edit/#{@c.id.to_s}" } Edit
+      %form.no_form{ :action => "/activity/#{@c.id.to_s}/delete", :method => "post" }
+        %button.boxed.delete{ :type => "submit" } Delete
 %ul.item_meta
   %li.author
     %a.tt{ :href => "/user/" + @c.user.name, :title => (@c.user.blob['real_name'] || nil) }

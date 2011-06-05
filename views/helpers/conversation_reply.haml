@@ -6,4 +6,21 @@
   %span.id
     %a{ :href => "/thread/" + @item.id.to_s + "#p" + @c.id.to_s }= "#" + @c.id.to_s
   %span.time= ago(@c.created_at)
-%div.item_content.format~ markdownit @c.content
+%div.item_content
+  - if @c.type == :post
+    %div.item_head
+      %h1= @c.title
+      %ul
+        %li
+          = @c.meta["like_count"]
+          likes &bull;
+          = haml :"helpers/like"
+        %li
+          = @c.meta['post_count']
+          posts
+  %div.format~ markdownit @c.content
+  - if session? and @cur_user.id == @c.user.id
+    %div.item_controls
+      %a.boxed{ :href => "/edit/#{@c.id.to_s}" } Edit
+      %form.no_form{ :action => "/activity/#{@c.id.to_s}/delete", :method => "post" }
+        %button.boxed.delete{ :type => "submit" } Delete

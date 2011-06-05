@@ -34,7 +34,8 @@ OEmbed.register_yaml_file(Dir.pwd + "/config-oembed.yml")
 ## Config Sinatra
 set :site_title, config['site_title']
 set :environment, config['env']
-set :show_exceptions, TRUE if config['env'] == 'development'
+set :show_exceptions, true if config['env'] == 'development'
+set :reload_templates, true if config['env'] == 'development'
 set :session_secret, config['secret']
 set :chat, config['chat']
 

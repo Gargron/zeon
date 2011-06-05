@@ -8,7 +8,7 @@ class Activity
     :video, :question, :event, :like, :bookmark, :vote, :tag,
     :attendance, :invitation, :poke, :recommendation, :message,
     :announcement, :follow, :unfollow ], :required => true, :index => true
-  property :title, String
+  property :title, String, :length => 3..100
   property :content, Text
   property :meta, Json, :default => {}
   property :updated_at, DateTime
@@ -93,6 +93,18 @@ class Activity
       Stalker.enqueue('notify', :id => self.id, :kind => :replied, :users => root.children(:type => :reply).users.map { |u| u.id } )
       #notify(:liked, root.children(:type => :like).users)
       Stalker.enqueue('notify', :id => self.id, :kind => :liked, :users => root.children(:type => :like).users.map { |u| u.id } )
+    end
+  end
+
+  before :destroy do
+    if self.parent
+      last = self.parent.children.last(2).last
+      last_id = last.id
+      last_user = last.user.name
+      last_time = last.created_at
+      self.parent.meta = parent.meta.merge( "post_count" => parent.meta.fetch("post_count", 2) - 1, "bumped_id" => last_id, "bumped_by" => last_user, "bumped_at" => last_time )
+      self.parent.updated_at = last_time
+      self.parent.save
     end
   end
 

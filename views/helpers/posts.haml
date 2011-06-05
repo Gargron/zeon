@@ -4,28 +4,27 @@
       %li.item{ :class => "item_" + @p.type.to_s, :id => "a" + @p.id.to_s }
         %div.item_content
           = haml :"helpers/posts_#{@p.type.to_s}"
-        - if @p.type != :image
-          %div.item_utils
-            Tagged:
-            - @p.tags.each do |tag|
-              %a.boxed{ :href => "/all/tags:" + tag.name }= tag.name
         %div.item_meta
           %ul
-            %li
+            %li.author
               %a{ :href => "/user/" + @p.user.name }
                 %img.avatar{ :src => @p.user.avatar(48), :width => "48", :height => "48" }
                 %span.name= @p.user.name
               %span.time= ago(@p.created_at)
             - if @p.type != :image
-              %li
+              %li.numbers
                 %span.likes
                   = @p.meta['like_count']
                   likes
                 %span.posts
                   = @p.meta['post_count']
                   posts
-              %li
-                %a.last_reply{ :href =>  goto(@p.id, @p.meta['bumped_id'], 20) }
+              %li.last_reply
+                %a{ :href =>  goto(@p.id, @p.meta['bumped_id'], 20) }
                   %span.what Last reply by
                   %span.name= @p.meta['bumped_by']
                   %span.time= ago(@p.meta['bumped_at'])
+              %li.tags
+                - @p.tags( :limit => 3 ).each do |tag|
+                  %a.boxed{ :href => "/all/tags:" + tag.name }= tag.name
+                &hellip;

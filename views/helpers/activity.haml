@@ -9,7 +9,7 @@
             %img.avatar{ :src => @a.user.avatar(48), :width => "48", :height => "48" }
             %span.name= you(@a.user.name)
           %span.verb= @a.verb
-          %a.object{ :href => "/thread/" + this.id.to_s }= @a.substantive(@cur_user.name)
+          %a.object{ :href => "/thread/" + this.id.to_s }= @a.substantive(@cur_user.id)
         %div.item_content
           - if not [:reply, :like].include? @a.type
             = haml :"helpers/activity_#{@a.type.to_s}"

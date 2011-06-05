@@ -60,11 +60,6 @@
               %img#logo{ :src => "/images/cl_logo.png", :width => "70", :height => "70" }
               The
               %strong Colorless
-      %aside#message_b
-        - if !flash[:error_b].nil?
-          %div.message.error= flash[:error_b]
-        - if !flash[:success_b].nil?
-          %div.message.success= flash[:success_b]
       %article#main
         %div#container
           = yield
@@ -75,6 +70,8 @@
               Hello,
               %strong= @cur_user.name
               %br
+              %a{ :href => "/home/inbox" } Inbox
+              \|
               %a{ :href => "/settings" } Settings
             - if ann = @cur_user.notifications.activities( :type => :announcement, :limit => 1 ).first
               %div.widget.important

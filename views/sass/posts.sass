@@ -45,11 +45,9 @@ ul.posts
           font-weight: bold
           a
             color: #aaa
-    div.item_utils
-      padding: 0 10px 1em 10px
     div.item_meta
       border-top: 1px solid #101010
-      font-size: 13px
+      font-size: 12px
       ul
         list-style: none
         overflow: hidden
@@ -65,6 +63,9 @@ ul.posts
             text-decoration: none
             &:hover
               text-decoration: underline
+          a.boxed
+            &:hover
+              text-decoration: none
           span.time, span.views, span.posts
             display: block
           span.name
@@ -75,3 +76,11 @@ ul.posts
             border: 4px solid #111
             width: 44px
             height: 44px
+          &.author
+            width: 150px
+          &.last_reply
+            width: 180px
+          &.numbers
+            width: 80px
+          &.tags
+            width: 130px
