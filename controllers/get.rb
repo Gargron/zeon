@@ -173,7 +173,7 @@ get '/user/:user/feed/?' do |user|
     entry = Proudhon::Entry.new
     entry.id = "tag:#{ROOT};activity:#{a.id.to_s}"
     entry.title = a.title
-    entry.content = a.content
+    entry.content = feed_content(a)
     entry.updated = Time.parse(a.updated_at.to_s)
     entry.published = Time.parse(a.created_at.to_s)
     entry.verb = a.type
@@ -184,13 +184,24 @@ get '/user/:user/feed/?' do |user|
       entry.links[:preview] = a.image.url(:thumb_all)
       entry.links[:enclosure] = a.image.url
     end
-    webpage = Proudhon::Annotation.new
-    #webpage.type = "webpage"
-    webpage.attributes = Proudhon::Attributes.new
-    webpage.attributes.attributes << Proudhon::Attribute.new
-    webpage.attributes.attributes.first.name = "url"
-    webpage.attributes.attributes.first.value = a.meta.fetch("url", false) || a.meta.fetch("video_url", false) || a.meta.fetch("source_url", "")
-    entry.annotations << webpage
+    if [:image, :link, :video].include? a.type
+      webpage = Proudhon::Annotation.new
+      #webpage.type = "webpage"
+      webpage.attributes = Proudhon::Attributes.new
+      webpage.attributes.attributes << Proudhon::Attribute.new
+      webpage.attributes.attributes.first.name = "url"
+      webpage.attributes.attributes.first.value = a.meta.fetch("url", false) || a.meta.fetch("video_url", false) || a.meta.fetch("source_url", "")
+      entry.annotations << webpage
+    end
+    if not a.content.empty?
+      text = Proudhon::Annotation.new
+      #text.type = "text"
+      text.attributes = Proudhon::Attributes.new
+      text.attributes.attributes << Proudhon::Attribute.new
+      text.attributes.attributes.first.name = "raw"
+      text.attributes.attributes.first.value = a.content
+      entry.annotations << text
+    end
     entry
   end
 

@@ -141,7 +141,7 @@ helpers do
     when :link
       markdown("[#{o.title}](#{o.meta["url"]})\n\n#{o.content}")
     when :video
-      markdown("[#{o.title}](#{o.meta["video_url"]})\n\n#{o.content}").meta["video_html"]
+      o.meta["video_html"] + markdown("\n[#{o.title}](#{o.meta["video_url"]})\n\n#{o.content}")
     end
   end
 end
