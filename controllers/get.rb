@@ -71,8 +71,10 @@ get %r{/all(/type:[post|image|link|video]+)?(/tags:[\w!&+~-]+)?(/[creator|poster
   }
 
   if all_tags.length > 0 && all_tags.length <= 7
+    @title = "Tagged " + all_tags.to_a.join(", ")
     @posts = ((Tag.all( :name => include_tags).activities( default ) - Tag.all( :name => exclude_tags).activities( default )) | Tag.all( :name => maybe_tags).activities( default )).paginate( :page => page, :per_page => 15 )
   else
+    @title = @filter ? "All #{@filter}s" : nil
     @posts = Activity.all( default ).paginate( :page => page, :per_page => 15 )
   end
 
@@ -112,8 +114,9 @@ get %r{/home(/inbox)?(/page/[\d]+)?} do |inbox, r_page|
 
   @inbox = true unless inbox.nil?
 
-  @activity = @cur_user.notifications( :kind => inbox.nil? ? [ :activity, :mine, :replied, :liked, :tag, :group] : [ :message, :mention ] ).activities( :order => :id.desc ).paginate( :page => p, :per_page => 10 )
-  #@activity = REDIS.zrevrange("notifications:#{(@inbox ? "inbox" : "home")}:#{@cur_user.id}", 0, -1).map { |o| JSON.parse(o) }.paginate( :page => p, :per_page => 10 )
+  @title = @inbox ? "Inbox" : "Dashboard"
+
+  @activity = @cur_user.notifications( :kind => inbox.nil? ? [ :activity, :mine, :replied, :liked, :tag, :group] : [ :message, :mention ] ).activities( :order => :id.desc ).paginate( :page => page, :per_page => 10 )
   haml :dashboard
 end
 
@@ -122,6 +125,7 @@ get %r{/thread/([\d]+)(/page/([\d]+))?} do |id, o, p|
   if @item.nil?
     halt 404
   end
+  @title = @item.title || "#" + @item.id.to_s
   @conversation = Activity.all( :conditions => ["id = ? or parent_id = ?", id, id], :order => :id.asc ).paginate({ :page => p, :per_page => 20})
   haml :thread
 end

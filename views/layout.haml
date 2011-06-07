@@ -2,7 +2,7 @@
 %html
   %head
     %meta{ :charset => "utf-8" }/
-    %title= settings.site_title
+    %title= (@title.nil? ? "" : (@title + " - ")) + settings.site_title
     %link{ :href => 'http://fonts.googleapis.com/css?family=Lobster', :rel => 'stylesheet', :type => 'text/css' }
     %link{ :rel => "stylesheet", :href => "/style/style.css", :type => "text/css" }/
     :javascript
