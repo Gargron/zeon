@@ -15,12 +15,9 @@ job 'email' do |args|
 
 end
 
-job 'pubsubhub' do |args|
+job 'pubsub_publish' do |args|
   atom = Proudhon::Atom.new
   atom.links[:hub] = 'http://pubsubhubbub.appspot.com/'
-  if args['thread']
-    atom.links[:self] = "http://#{ROOT}/thread/#{args['thread']}/feed"
-  end
   if args['user']
     atom.links[:self] = "http://#{ROOT}/user/#{args['user']}/feed"
   end

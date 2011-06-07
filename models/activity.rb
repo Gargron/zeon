@@ -79,8 +79,6 @@ class Activity
         Stalker.enqueue('notify', :id => self.id, :kind => :mention, :users => mentions.map { |u| u.id unless u.id == self.user.id } )
         #notify(:group, root.group.users) if root.group
         Stalker.enqueue('notify', :id => self.id, :kind => :group, :users => root.group.users.map { |u| u.id } ) if root.group
-        #notify(:tag, root.tags.users)
-        #Stalker.enqueue('notify', :id => self.id, :kind => :tag, :users => root.tags.users)
       end
 
       #notify(:activity, self.user.friendships2.all(:accepted => true).users)
@@ -93,6 +91,8 @@ class Activity
       Stalker.enqueue('notify', :id => self.id, :kind => :replied, :users => root.children(:type => :reply).users.map { |u| u.id } )
       #notify(:liked, root.children(:type => :like).users)
       Stalker.enqueue('notify', :id => self.id, :kind => :liked, :users => root.children(:type => :like).users.map { |u| u.id } )
+
+      Stalker.enqueue('pubsub_publish', :user => self.user.id)
     end
   end
 

@@ -178,6 +178,7 @@ post '/pubsub/?' do
   atom.entries.each do |entry|
     uri = URI.parse atom.author.uri
     user = User.first( :name => atom.author.name, :domain => uri.host )
+
     activity = Activity.create( :type => entry.objtype, :title => entry.title, :content => entry.content, :user => user )
   end
 
@@ -197,7 +198,7 @@ post '/follow' do
   name = subject[0]
   domain = subject[1]
 
-  user = User.first( :name => name, :domain => domain) || User.create( :status => :remote, :name => name, :domain => domain, :meta => { 'remote_url' => feed } )
+  user = User.first( :name => name, :domain => domain) || User.create( :status => :remote, :name => name, :domain => domain, :blob => { 'remote_url' => feed } )
 
   if user.id == @cur_user.id
     redirect '/follow', :error => "Cannot follow self. It's like dividing by zero in an unobserved room."
@@ -216,8 +217,10 @@ post '/follow' do
 
   if user.domain != ROOT
     atom = Proudhon::Atom.from_uri feed
-    atom.subscribe "http://{ROOT}/pubsub"
+    atom.subscribe "http://#{ROOT}/pubsub"
   end
+
+  redirect '/follow', :success => "Yay! Now you're following #{name}"
 end
 
 post '/user/:id/:action' do |id, action|

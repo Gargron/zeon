@@ -142,7 +142,7 @@ end
 
 ## Profiles
 get '/user/:user/?' do |user|
-  @user = User.first( :name => user )
+  @user = User.first( :name => user, :domain => ROOT )
 
   unless @user
     halt 404
@@ -233,7 +233,7 @@ get '/.well-known/host-meta' do
   Proudhon::HostMeta.to_xml("http://#{ROOT}/webfinger/?id={uri}")
 end
 
-get '/pubsub' do
+get '/pubsub/?' do
   topic = params['hub.topic']
   mode = params['hub.mode']
 
