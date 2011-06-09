@@ -22,4 +22,10 @@ class Friendship
       end
     end
   end
+
+  before :destroy do
+    atom = Proudhon::Atom.from_feed self.friend.meta.fetch("remote_url")
+    atom.unsubscribe
+  end
+
 end

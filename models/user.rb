@@ -2,10 +2,10 @@ class User
   include DataMapper::Resource
 
   property :id, Serial
-  property :name, String, :required => true, :unique => :domain, :index => true, :length => 1..30, :format => /^\w+$/i
-  property :domain, String, :default => ROOT
+  property :name, String, :required => true, :unique_index => :name_domain, :index => true, :length => 1..30, :format => /^\w+$/i
+  property :domain, String, :default => ROOT, :unique_index => :name_domain
   property :password, BCryptHash, :length => 6..200
-  property :email, String, :unique => true, :format => :email_address
+  property :email, String, :format => :email_address
   property :status, Enum[ :active, :remote, :administrator, :inactive, :deleted ], :required => true, :default => :active
   property :blob, Json, :default => {}
   property :private_key, Text
@@ -25,6 +25,8 @@ class User
 
   validates_presence_of :password, :if => lambda { |t| t.status != :remote }
   validates_presence_of :email, :if => lambda { |t| t.status != :remote }
+
+  validates_uniqueness_of :email, :if => lambda { |t| t.status != :remote }
 
   def avatar(size = 30)
     "http://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(email)}?s=#{size}"

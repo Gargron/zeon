@@ -92,7 +92,7 @@ class Activity
       #notify(:liked, root.children(:type => :like).users)
       Stalker.enqueue('notify', :id => self.id, :kind => :liked, :users => root.children(:type => :like).users.map { |u| u.id } )
 
-      Stalker.enqueue('pubsub_publish', :user => self.user.id)
+      Stalker.enqueue('pubsubpub', :user => self.user.id)
     end
   end
 
