@@ -17,7 +17,12 @@ end
 
 job 'pubsubpub' do |args|
   atom = Proudhon::Atom.new
-  atom.links[:hub] = 'http://pubsubhubbub.appspot.com'
+  atom.links[:hub] = 'http://zeon.superfeedr.com'
   atom.links[:self] = "http://#{ROOT}/user/#{args['user']}/feed"
-  atom.publish
+  begin
+    atom.publish
+    puts "Published"
+  rescue => e
+    puts "Didn't publish: " + e.response
+  end
 end

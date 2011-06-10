@@ -50,12 +50,13 @@ class Activity
   GROUPTAG = /~([a-z1-9]+)/i
 
   ## Callbacks
-  after :create do
+  before :create do
     # Denormalize
     if NEW_CONTENT.include? self.type
       self.meta = meta.merge( "post_count" => 1, "like_count" => 0, "bumped_id" => self.id, "bumped_by" => self.user.name, "bumped_at" => self.created_at )
-      self.save
     end
+  end
+  after :create do
     # Update parent's denormalization
     if REPLY.include? self.type
       self.parent.meta = parent.meta.merge( "post_count" => parent.meta.fetch("post_count", 1) + 1, "bumped_id" => self.id, "bumped_by" => self.user.name, "bumped_at" => DateTime.now )
@@ -71,7 +72,6 @@ class Activity
 
       unless self.content.nil?
         mentions = User.all(:name => content.scan(MENTION))
-        #self.tags = content.scan(HASHTAG).flatten.map {|t| Tag.first(:name => t) || Tag.create(:name => t) }
         self.group = Group.first(:name => content.scan(GROUPTAG))
         self.save
 

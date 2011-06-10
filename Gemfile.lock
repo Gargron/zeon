@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/Gargron/proudhon.git
-  revision: 70f77c616217454016d0c995104ace3e47ce37bd
+  revision: e5d7e658e14165d3409c5732dbef46e643fea25d
   specs:
     proudhon (0.1.5.5)
       json
