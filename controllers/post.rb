@@ -172,6 +172,9 @@ post '/salmon/?' do
 end
 
 post '/pubsub/?' do
+  #logger = Logger.new('logfile.log')
+  #logger.info("Pubsub POST:") { request.body.read }
+
   xml = CGI.unescape(request.body.read)
   atom = Nokogiri::XML.parse(xml)
 

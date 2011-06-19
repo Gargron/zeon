@@ -13,6 +13,7 @@ require 'fileutils'
 require 'open-uri'
 require 'uri'
 require 'nokogiri'
+require 'logger'
 require 'json'
 
 require 'sinatra/jsonp'
