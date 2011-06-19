@@ -167,26 +167,18 @@ end
 
 get '/webfinger/?' do
   r_user = params[:id].to_s.gsub(/acct:/, '').split('@').first
-  user = User.first( :name => r_user )
-  finger = Proudhon::Finger.new
-  finger.subject = "acct:#{user.name}@#{ROOT}"
-  finger.alias = "http://#{ROOT}/user/#{user.name}"
-  finger.links[:updates_from] = "http://#{ROOT}/user/#{user.name}/feed"
-  finger.links[:mention] = "http://#{ROOT}/salmon"
-  finger.links[:replies] = "http://#{ROOT}/salmon"
-  finger.links[:salmon] = "http://#{ROOT}/salmon"
-  finger.links[:profile] = "http://#{ROOT}/user/#{user.name}"
-  key = OpenSSL::PKey::RSA.new(user.private_key)
-  finger.links[:magic_key] = Proudhon::MagicKey.to_s(key)
-  finger.links[:hcard] = "http://#{ROOT}/user/#{user.name}"
+  @user = User.first( :name => r_user )
+  error 404 unless @user
+  key = OpenSSL::PKey::RSA.new(@user.private_key)
+  @magic_key = Proudhon::MagicKey.to_s(key)
 
   content_type 'application/xrd+xml'
-  finger.to_xml
+  haml :"user/webfinger", :layout => false
 end
 
 get '/.well-known/host-meta' do
   content_type 'application/xrd+xml'
-  Proudhon::HostMeta.to_xml("http://#{ROOT}/webfinger/?id={uri}")
+  haml :"user/hostmeta", :layout => false
 end
 
 get '/pubsub/?' do

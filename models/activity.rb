@@ -55,7 +55,17 @@ class Activity
     if NEW_CONTENT.include? self.type
       self.meta = meta.merge( "post_count" => 1, "like_count" => 0, "bumped_id" => self.id, "bumped_by" => self.user.name, "bumped_at" => self.created_at )
     end
+
+    if self.image
+      tempfile = self.image.queued_for_write[:original]
+
+      unless tempfile.nil?
+        dimensions = Paperclip::Geometry.from_file(tempfile)
+        self.image_dimensions = dimensions.to_s
+      end
+    end
   end
+
   after :create do
     # Update parent's denormalization
     if REPLY.include? self.type

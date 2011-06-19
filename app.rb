@@ -19,6 +19,7 @@ require 'json'
 require 'sinatra/jsonp'
 require 'sinatra/session'
 require 'sinatra/flash'
+require 'rack-flash'
 require 'sinatra/redirect_with_flash'
 require 'redis-store'
 require 'will_paginate'
@@ -43,6 +44,8 @@ set :session_secret, config['secret']
 set :chat, config['chat']
 set :logging, true
 set :run, false
+
+use Rack::Flash, :sweep => true
 
 log = File.new("app.log", "a")
 STDOUT.reopen(log)

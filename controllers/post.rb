@@ -24,8 +24,7 @@ post '/activity' do
     unless params[:url].empty? or !(params[:url] =~ URI::regexp).nil?
       redirect '/create', :error => "The source URL you entered wasn't a URL. Either input a real one or none at all."
     end
-    dimensions = Paperclip::Geometry.from_file(params[:image_file][:tempfile])
-    if image = Activity.create( :type => :image, :user => @cur_user, :content => params[:text], :meta => params[:url].empty? ? {} : { :source_url => params[:url] }, :image => paper_hash(params[:image_file]), :image_dimensions => dimensions.width.round.to_s + "x" + dimensions.height.round.to_s ) and image.saved?
+    if image = Activity.create( :type => :image, :user => @cur_user, :content => params[:text], :meta => params[:url].empty? ? {} : { :source_url => params[:url] }, :image => paper_hash(params[:image_file]) ) and image.saved?
       image.add_tags(params[:tags])
       redirect '/thread/' + image.id.to_s
     else
@@ -205,6 +204,7 @@ post '/pubsub/?' do
     next unless user
 
     meta = {}
+    image = nil
 
     # Type-specific things
     case entry[:objtype]
@@ -212,10 +212,14 @@ post '/pubsub/?' do
       type = :post
     when "http://activitystrea.ms/schema/1.0/image"
       type = :image
+      image = download_image(entry[:image])
       meta["source_url"] = entry[:link]
     when "http://activitystrea.ms/schema/1.0/video"
       type = :video
       meta["video_url"] = entry[:link]
+      if oembed = OEmbed.valid?(entry[:link], "maxwidth" => "600", "maxheight" => "350")
+        meta["video_html"] = oembed.to_s
+      end
     when "http://activitystrea.ms/schema/1.0/review"
       type = :link
       meta["url"] = entry[:link]
@@ -232,6 +236,7 @@ post '/pubsub/?' do
       :type => type,
       :title => entry[:title],
       :content => entry[:content],
+      :image => image,
       :meta => meta,
       :created_at => Time.parse(entry[:published]),
       :updated_at => Time.parse(entry[:updated])
@@ -256,17 +261,23 @@ post '/follow' do
   end
 
   feed = finger.links[:updates_from]
+  gravatar = URI.parse finger.links[:gravatar].to_s
+  gravatar_hash = gravatar.path.gsub(/\/avatar\//, '')
   subject = finger.subject.gsub(/acct:/, '').split('@')
   name = subject[0]
   domain = subject[1]
 
-  user = User.first( :name => name, :domain => domain) || User.create( :status => :remote, :name => name, :domain => domain, :blob => { 'remote_url' => feed } )
+  user = User.first( :name => name, :domain => domain) || User.create( :status => :remote, :name => name, :domain => domain, :blob => { 'remote_url' => feed, 'email_hash' => gravatar_hash } )
 
   if user.id == @cur_user.id
     redirect '/follow', :error => "Cannot follow self. It's like dividing by zero in an unobserved room."
   end
 
   if @cur_user.does_follow user
+    user.blob = user.blob.merge( "remote_url" => feed, "email_hash" => gravatar_hash )
+    if user.save
+      flash.now[:notice] = "Feed URL and other user data updated, anyway"
+    end
     redirect '/follow', :error => "Already following #{name}"
   end
 
@@ -286,7 +297,7 @@ post '/follow' do
     go_on = true
   end
   if go_on
-    redirect '/follow', :success => "Yay! Now you're following #{name}"
+    redirect '/follow', :notice => "Yay! Now you're following #{name}"
   end
 end
 
@@ -298,20 +309,8 @@ post '/user/:id/:action' do |id, action|
     @cur_user.follows << user
     @cur_user.save
     if @cur_user.saved?
-      redirect '/home', :success_b => "You are now following #{user.name}"
+      redirect '/home', :notice => "You are now following #{user.name}"
     end
-  end
-end
-
-post '/login.json' do
-  halt 303 if session?
-
-  if user = User.first(:name => params[:name], :status => [:active, :administrator]) and user.password == params[:password]
-    session_start!
-    session[:id], session[:name], session[:email] = user.id, user.name, user.email
-    {:status => "ok"}.to_json
-  else
-    halt 303, {:error => "Wrong username/login combination"}.to_json
   end
 end
 
@@ -321,22 +320,10 @@ post '/login' do
   if user = User.first(:name => params[:name], :status => [:active, :administrator]) and user.password == params[:password]
     session_start!
     session[:id], session[:name], session[:email] = user.id, user.name, user.email
-    redirect '/', :success => 'Login successful!'
+    redirect '/', :notice => 'Login successful!'
   else
     flash.now[:error] = "Wrong username/login combination"
     haml :'user/login'
-  end
-end
-
-post '/signup.json' do
-  halt 303, {:error => 'You\'re already logged on.'} if session?
-
-  if user = User.create(:name => params[:name], :password => params[:password], :email => params[:email]) and user.saved?
-    session_start!
-    session[:id], session[:name], session[:email] = user.id, user.name, user.email
-    {:status => "ok"}.to_json
-  else
-    halt 303, {:error => user.errors.to_a.join(' - ')}.to_json
   end
 end
 
@@ -346,7 +333,7 @@ post '/signup' do
   if user = User.create(:name => params[:name], :password => params[:password], :email => params[:email]) and user.saved?
     session_start!
     session[:id], session[:name], session[:email] = user.id, user.name, user.email
-    redirect '/', :success => "Account #{user.name} successfully created!"
+    redirect '/', :notice => "Account #{user.name} successfully created!"
   else
     flash.now[:error] = user.errors.to_a.join(' - ')
   end
@@ -366,24 +353,10 @@ post '/reset' do
     user.save
   end
 
-  redirect '/reset', :success => "If you're registered with us, your new password was just sent to your e-mail."
+  redirect '/reset', :notice => "If you're registered with us, your new password was just sent to your e-mail."
 end
 
-post '/profile.json' do
-  halt 303, {:error => 'You\'re not logged.'} unless session?
-
-  if @cur_user.password == params[:password]
-    @cur_user.password = params[:new_password] unless params[:new_password].empty?
-    @cur_user.email = params[:email]
-    @cur_user.save
-
-    {:status => "Successfully saved!"}.to_json
-  else
-    halt 303, {:error => "Wrong password!"}.to_json
-  end
-end
-
-post '/profile' do
+post '/settings' do
   session!
 
   if @cur_user.password == params[:password]
@@ -391,11 +364,9 @@ post '/profile' do
     @cur_user.email = params[:email]
     @cur_user.save
 
-    flash.now[:success] = "Successfully saved!"
-    haml :'user/profile'
+    redirect '/settings', :notice => "Successfully saved!"
   else
-    flash.now[:error] = "Wrong password!"
-    haml :'user/profile'
+    redirect '/settings', :error => "Wrong password!"
   end
 end
 
@@ -406,7 +377,7 @@ post '/profile/delete' do
     @cur_user.status = :deleted
     @cur_user.save
     session_end!
-    redirect '/', :success => "Your account was terminated."
+    redirect '/', :notice => "Your account was terminated."
   else
     flash.now[:error] = "Wrong password!"
   end
