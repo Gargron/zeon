@@ -41,6 +41,7 @@ set :show_exceptions, true if config['env'] == 'development'
 set :reload_templates, true if config['env'] == 'development'
 set :session_secret, config['secret']
 set :chat, config['chat']
+set :run, false
 
 Tilt.register 'markdown', Tilt::RedcarpetTemplate
 

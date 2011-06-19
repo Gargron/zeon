@@ -6,7 +6,6 @@
   %link{ :rel => "self", :href => "http://#{ROOT}/user/#{@user.name}/feed", :type => "application/atom+xml" }/
   %link{ :rel => "alternate", :href => "http://#{ROOT}/user/#{@user.name}", :type => "text/html" }/
   %link{ :rel => "hub", :href => "http://pubsubhubbub.appspot.com" }/
-
   - @entries.each do |a|
     %entry
       %id= "tag:#{ROOT},#{Time.parse(a.created_at.to_s).strftime("%Y")}:activity:#{a.id}"
@@ -37,7 +36,7 @@
             %image= a.image.url(:medium)
             %fullImage= a.image.url
             - if a.content?
-              %summary= a.content
+              %content= a.content
           - when :link
             %activity:object-type http://activitystrea.ms/schema/1.0/review
             %link{ :rel => "enclosure", :href => a.meta.fetch("url", false), :type => "text/html" }/

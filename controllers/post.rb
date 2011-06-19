@@ -172,60 +172,58 @@ post '/salmon/?' do
 end
 
 post '/pubsub/?' do
-  #logger = Logger.new('logfile.log')
-  #logger.info("Pubsub POST:") { request.body.read }
+  xml = CGI::unescape(request.body.read)
 
-  xml = CGI.unescape(request.body.read)
-  atom = Nokogiri::XML.parse(xml)
+  atom = Nokogiri::XML::Document.parse xml
 
-  atom.xpath('//xmlns:entry').each do |e|
-    # Find existing remote user
-    uri = URI.parse e.xpath('//xmlns:author/xmlns:uri').first.content
-    user = User.find( :name => e.xpath('//xmlns:author/xmlns:name').first.content, :domain => uri.host )
+  entries = atom.css("entry")
+
+  entries.each do |re|
+    e = re.children
+    entry = {
+      :uri => e.at_css("author uri").content,
+      :name => e.at_css("author name").content,
+      :title => e.at_css("title").nil? ? nil : e.at_css("title").content,
+      :content => e.at_css("content").nil? ? nil : e.at_css("content").content,
+      :link => e.at_css("link[rel=enclosure]").nil? ? nil : e.at_css("link[rel=enclosure]")["href"],
+      :image => e.at_css("fullImage").nil? ? nil : e.at_css("fullImage").content,
+      :objtype => e.at_xpath("activity:object-type").content
+    }
+
+    # Find remote user
+    uri = URI.parse entry[:uri]
+    user = User.find( :name => entry[:name], :domain => uri.host )
 
     # Otherwise skip, no anons wanted
     next unless user
 
     meta = {}
-    title = nil
 
-    # Determine post type, optional meta stuff
-    case e.xpath('//activity:object/activity:object-type').first.content
+    # Type-specific things
+    case entry[:objtype]
     when "http://activitystrea.ms/schema/1.0/article"
       type = :post
-      title = e.xpath('//activity:object/xmlns:title').first.content
     when "http://activitystrea.ms/schema/1.0/image"
       type = :image
-      image_url = e.xpath('//activity:object/xmlns:fullImage').first.content
-      image = download_image(image_url) || nil
-      if e.xpath('//activity:object/xmlns:link[@rel=enclosure]').first['href']
-        meta["source_url"] = e.xpath('//activity:object/xmlns:link[@rel=enclosure]').first['href']
-      end
+      meta["source_url"] = entry[:link]
     when "http://activitystrea.ms/schema/1.0/video"
       type = :video
-      title = e.xpath('//activity:object/xmlns:title').first.content
-      video_html = nil
-      if oembed = OEmbed.valid?(e.xpath('//activity:object/xmlns:link[@rel=enclosure]').first['href'], "maxwidth" => "600", "maxheight" => "350")
-        video_html = oembed.to_s
-      end
-      meta = { "video_url" => e.xpath('//activity:object/xmlns:link[@rel=enclosure]').first['href'], "video_html" => video_html }
+      meta["video_url"] = entry[:link]
     when "http://activitystrea.ms/schema/1.0/review"
       type = :link
-      title = e.xpath('//activity:object/xmlns:title').first.content
-      meta = { "url" => e.xpath('//activity:object/xmlns:link[@rel=enclosure]').first['href'] }
+      meta["url"] = entry[:link]
     end
 
-    # If we don't know what this post is, balls to it
+    # If post type is unknown, balls to it
     next unless type
 
-    # Create respective post
-    Activity.create(
+    # Well then, create the post
+    post = Activity.create(
       :user => user,
       :type => type,
-      :title => title,
-      :content => e.xpath('//activity:object/xmlns:content').first.content || e.xpath('//activity:object/xmlns:summary').first.content,
-      :meta => meta,
-      :image => image
+      :title => entry[:title],
+      :content => entry[:content],
+      :meta => meta
     )
   end
 
