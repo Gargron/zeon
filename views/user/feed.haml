@@ -35,7 +35,7 @@
               %link{ :rel => "enclosure", :href => source, :type => "text/html" }/
             %image= a.image.url(:medium)
             %fullImage= a.image.url
-            - if a.content?
+            - if not a.content.nil?
               %content= a.content
           - when :link
             %activity:object-type http://activitystrea.ms/schema/1.0/review

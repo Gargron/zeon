@@ -174,8 +174,8 @@ end
 post '/pubsub/?' do
   xml = CGI::unescape(request.body.read)
 
-  #logger = Logger.new('logfile.log')
-  #logger.info("POST")
+  logger = Logger.new('logfile.log')
+  logger.info("POST")
 
   atom = Nokogiri::XML::Document.parse xml
 
@@ -199,7 +199,7 @@ post '/pubsub/?' do
     uri = URI.parse entry[:uri]
     user = User.first( :name => entry[:name], :domain => uri.host )
 
-    #logger.info("User") { user.name + "@" + user.domain }
+    logger.info("User") { user.name + "@" + user.domain }
 
     # Otherwise skip, no anons wanted
     next unless user
@@ -221,7 +221,7 @@ post '/pubsub/?' do
       meta["url"] = entry[:link]
     end
 
-    #logger.info("Type") { entry[:objtype] + ": " + type.to_s }
+    logger.info("Type") { entry[:objtype] + ": " + type.to_s }
 
     # If post type is unknown, balls to it
     next unless type
@@ -238,7 +238,7 @@ post '/pubsub/?' do
     ) and post.saved?
       next
     else
-      #logger.error("Creating post") { post.errors }
+      logger.error("Creating post") { post.errors }
     end
   end
 
