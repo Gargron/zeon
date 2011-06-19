@@ -192,20 +192,29 @@ post '/pubsub/?' do
       links[l["rel"]] = l["href"]
     end
 
+    meta = {}
+    title = nil
+
     # Determine post type, optional meta stuff
     case e["activity:object"]["activity:object-type"]
     when "http://activitystrea.ms/schema/1.0/article"
       type = :post
       title = e["activity:object"]["title"]
-      meta = {}
     when "http://activitystrea.ms/schema/1.0/image"
       type = :image
-      title = nil
-      meta = {}
+      image_url = e["activity:object"]["fullImage"]
+      image = download_image(image_url) || nil
+      if links["enclosure"]
+        meta["source_url"] = links["enclosure"]
+      end
     when "http://activitystrea.ms/schema/1.0/video"
       type = :video
       title = e["activity:object"]["title"]
-      meta = {}
+      video_html = nil
+      if oembed = OEmbed.valid?(links["enclosure"], "maxwidth" => "600", "maxheight" => "350")
+        video_html = oembed.to_s
+      end
+      meta = { "video_url" => links["enclosure"], "video_html" => video_html }
     when "http://activitystrea.ms/schema/1.0/review"
       type = :link
       title = e["activity:object"]["title"]
@@ -221,7 +230,8 @@ post '/pubsub/?' do
       :type => type,
       :title => title,
       :content => e["activity:object"]["content"] || e["activity:object"]["summary"],
-      :meta => meta
+      :meta => meta,
+      :image => image
     )
   end
 

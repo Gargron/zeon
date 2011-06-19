@@ -40,8 +40,12 @@
             %fullImage= a.image.url
             - if a.content?
               %summary= a.content
-          - when :link, :video
+          - when :link
             %activity:object-type http://activitystrea.ms/schema/1.0/review
-            %link{ :rel => "enclosure", :href => a.meta.fetch("url", false) || a.meta.fetch("video_url"), :type => "text/html" }/
+            %link{ :rel => "enclosure", :href => a.meta.fetch("url", false), :type => "text/html" }/
+            %content= a.content
+          - when :video
+            %activity:object-type http://activitystrea.ms/schema/1.0/video
+            %link{ :rel => "enclosure", :href => a.meta.fetch("video_url", false), :type => "text/html" }/
             %content= a.content
       %content{ :type => "html" }&~ feed_content(a)

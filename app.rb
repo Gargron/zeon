@@ -10,6 +10,7 @@ require 'proudhon'
 
 require 'yaml'
 require 'fileutils'
+require 'open-uri'
 require 'uri'
 require 'crack'
 require 'json'
