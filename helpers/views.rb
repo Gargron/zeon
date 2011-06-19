@@ -3,7 +3,8 @@ helpers do
     total_pages, current_page = collection.total_pages, collection.current_page
     prev = nil
     gap_marker = '&hellip;'
-    inner_window, outer_window = 4, 1
+    inner_window = 2
+    outer_window = 1
     window_from = current_page - inner_window
     window_to = current_page + inner_window
     @links = []

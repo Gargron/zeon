@@ -29,7 +29,11 @@ class User
   validates_uniqueness_of :email, :if => lambda { |t| t.status != :remote }
 
   def avatar(size = 30)
-    "http://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(email)}?s=#{size}"
+    if not email.nil?
+      "http://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(email)}?s=#{size}"
+    else
+      "http://www.gravatar.com/avatar/?s=#{size}"
+    end
   end
 
   def feed_url

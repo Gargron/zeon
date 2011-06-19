@@ -174,6 +174,9 @@ end
 post '/pubsub/?' do
   xml = CGI::unescape(request.body.read)
 
+  #logger = Logger.new('logfile.log')
+  #logger.info("POST")
+
   atom = Nokogiri::XML::Document.parse xml
 
   entries = atom.css("entry")
@@ -183,16 +186,20 @@ post '/pubsub/?' do
     entry = {
       :uri => e.at_css("author uri").content,
       :name => e.at_css("author name").content,
+      :published => e.at_css("published").content,
+      :updated => e.at_css("updated").content,
       :title => e.at_css("title").nil? ? nil : e.at_css("title").content,
       :content => e.at_css("content").nil? ? nil : e.at_css("content").content,
       :link => e.at_css("link[rel=enclosure]").nil? ? nil : e.at_css("link[rel=enclosure]")["href"],
       :image => e.at_css("fullImage").nil? ? nil : e.at_css("fullImage").content,
-      :objtype => e.at_xpath("activity:object-type").content
+      :objtype => e.at_xpath("//activity:object/activity:object-type").content
     }
 
     # Find remote user
     uri = URI.parse entry[:uri]
-    user = User.find( :name => entry[:name], :domain => uri.host )
+    user = User.first( :name => entry[:name], :domain => uri.host )
+
+    #logger.info("User") { user.name + "@" + user.domain }
 
     # Otherwise skip, no anons wanted
     next unless user
@@ -214,17 +221,25 @@ post '/pubsub/?' do
       meta["url"] = entry[:link]
     end
 
+    #logger.info("Type") { entry[:objtype] + ": " + type.to_s }
+
     # If post type is unknown, balls to it
     next unless type
 
     # Well then, create the post
-    post = Activity.create(
+    if post = Activity.create(
       :user => user,
       :type => type,
       :title => entry[:title],
       :content => entry[:content],
-      :meta => meta
-    )
+      :meta => meta,
+      :created_at => Time.parse(entry[:published]),
+      :updated_at => Time.parse(entry[:updated])
+    ) and post.saved?
+      next
+    else
+      #logger.error("Creating post") { post.errors }
+    end
   end
 
 end
