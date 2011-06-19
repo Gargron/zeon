@@ -1,8 +1,8 @@
 !!! XML
 %feed{ :xmlns => "http://www.w3.org/2005/Atom", :"xmlns:activity" => "http://activitystrea.ms/spec/1.0/" }
-  %id= "tag:#{ROOT},#{Time.parse(@entries.first.created_at.to_s).strftime("%Y")}:feed:#{@user.id}"
+  %id= "tag:#{ROOT},#{@updated.strftime("%Y")}:feed:#{@user.id}"
   %title= @user.name
-  %updated= Time.parse(@entries.first.created_at.to_s).strftime("%Y-%m-%dT%TZ")
+  %updated= @updated.strftime("%Y-%m-%dT%TZ")
   %link{ :rel => "self", :href => "http://#{ROOT}/user/#{@user.name}/feed", :type => "application/atom+xml" }/
   %link{ :rel => "alternate", :href => "http://#{ROOT}/user/#{@user.name}", :type => "text/html" }/
   %link{ :rel => "hub", :href => "http://pubsubhubbub.appspot.com" }/

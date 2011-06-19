@@ -231,6 +231,8 @@ end
 post '/follow' do
   session!
 
+  redirect '/follow', :error => "Empty ID!" unless not params[:user_id].nil?
+
   finger = Proudhon::Finger.fetch params[:user_id]
 
   unless !finger.nil?
@@ -259,12 +261,17 @@ post '/follow' do
     redirect '/follow', :error => "Dammit, there was a problem following #{name}"
   end
 
-  if user.domain != ROOT
+  unless user.domain == ROOT
     atom = Proudhon::Atom.from_uri feed
-    atom.subscribe "http://#{ROOT}/pubsub"
+    if atom.subscribe "http://#{ROOT}/pubsub"
+      go_on = true
+    end
+  else
+    go_on = true
   end
-
-  redirect '/follow', :success => "Yay! Now you're following #{name}"
+  if go_on
+    redirect '/follow', :success => "Yay! Now you're following #{name}"
+  end
 end
 
 post '/user/:id/:action' do |id, action|

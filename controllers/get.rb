@@ -160,6 +160,7 @@ get '/user/:user/feed/?' do |user|
   @user = User.first( :name => user )
   halt 404 unless @user
   @entries = Activity.all( :type => [:post, :image, :video, :link], :parent_id => nil, :user => @user, :order => :id.desc )
+  @updated = @entries.first.nil? ? Time.now : Time.parse(@entries.first.created_at.to_s)
   content_type 'application/atom+xml'
   haml :"user/feed", :layout => false
 end
