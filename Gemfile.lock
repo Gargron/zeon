@@ -23,7 +23,6 @@ GEM
     addressable (2.2.6)
     bcrypt-ruby (2.1.4)
     beanstalk-client (1.1.0)
-    crack (0.1.8)
     data_objects (0.10.6)
       addressable (~> 2.1)
     datamapper (1.1.0)
@@ -116,11 +115,11 @@ PLATFORMS
 DEPENDENCIES
   activesupport
   bcrypt-ruby (>= 2.1.4)
-  crack
   datamapper (>= 1.1.0)
   dm-mysql-adapter
   dm-paperclip
   haml
+  nokogiri
   oembed_links
   proudhon!
   rack-flash

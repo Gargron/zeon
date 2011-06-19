@@ -14,7 +14,7 @@
       %updated= Time.parse(a.updated_at.to_s).strftime("%Y-%m-%dT%TZ")
       %author
         %activity:object-type http://activitystrea.ms/schema/1.0/person
-        %id= "tag:#{ROOT},#{Time.parse(a.created_at.to_s).strftime("%Y")}:person:#{a.user.name}"
+        %id= "tag:#{ROOT},#{Time.parse(a.created_at.to_s).strftime("%Y")}:person:#{a.user.id}"
         %name= a.user.name
         %uri= "http://#{ROOT}/user/#{a.user.name}"
         %link{ :rel => "alternate", :href => "http://#{ROOT}/user/#{a.user.name}", :type => "text/html" }/

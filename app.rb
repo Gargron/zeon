@@ -12,7 +12,7 @@ require 'yaml'
 require 'fileutils'
 require 'open-uri'
 require 'uri'
-require 'crack'
+require 'nokogiri'
 require 'json'
 
 require 'sinatra/jsonp'

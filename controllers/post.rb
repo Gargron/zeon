@@ -173,52 +173,43 @@ end
 
 post '/pubsub/?' do
   xml = CGI.unescape(request.body.read)
-  atom = Crack::XML.parse(xml)
+  atom = Nokogiri::XML.parse(xml)
 
-  entries = atom["feed"]["entry"].kind_of?(Array) ? atom["feed"]["entry"] : [atom["feed"]["entry"]]
-
-  entries.each do |e|
+  atom.xpath('//xmlns:entry').each do |e|
     # Find existing remote user
-    uri = URI.parse e["author"]["uri"]
-    user = User.find( :name => e["author"]["name"], :domain => uri.host )
+    uri = URI.parse e.xpath('//xmlns:author/xmlns:uri').first.content
+    user = User.find( :name => e.xpath('//xmlns:author/xmlns:name').first.content, :domain => uri.host )
 
     # Otherwise skip, no anons wanted
     next unless user
-
-    raw_links = e["activity:object"]["link"].kind_of?(Array) ? e["activity:object"]["link"] : [e["activity:object"]["link"]]
-    links = {}
-
-    raw_links.each do |l|
-      links[l["rel"]] = l["href"]
-    end
 
     meta = {}
     title = nil
 
     # Determine post type, optional meta stuff
-    case e["activity:object"]["activity:object-type"]
+    case e.xpath('//activity:object/activity:object-type').first.content
     when "http://activitystrea.ms/schema/1.0/article"
       type = :post
-      title = e["activity:object"]["title"]
+      title = e.xpath('//activity:object/xmlns:title').first.content
     when "http://activitystrea.ms/schema/1.0/image"
       type = :image
-      image_url = e["activity:object"]["fullImage"]
+      image_url = e.xpath('//activity:object/xmlns:fullImage').first.content
       image = download_image(image_url) || nil
-      if links["enclosure"]
-        meta["source_url"] = links["enclosure"]
+      if e.xpath('//activity:object/xmlns:link[@rel=enclosure]').first['href']
+        meta["source_url"] = e.xpath('//activity:object/xmlns:link[@rel=enclosure]').first['href']
       end
     when "http://activitystrea.ms/schema/1.0/video"
       type = :video
-      title = e["activity:object"]["title"]
+      title = e.xpath('//activity:object/xmlns:title').first.content
       video_html = nil
-      if oembed = OEmbed.valid?(links["enclosure"], "maxwidth" => "600", "maxheight" => "350")
+      if oembed = OEmbed.valid?(e.xpath('//activity:object/xmlns:link[@rel=enclosure]').first['href'], "maxwidth" => "600", "maxheight" => "350")
         video_html = oembed.to_s
       end
-      meta = { "video_url" => links["enclosure"], "video_html" => video_html }
+      meta = { "video_url" => e.xpath('//activity:object/xmlns:link[@rel=enclosure]').first['href'], "video_html" => video_html }
     when "http://activitystrea.ms/schema/1.0/review"
       type = :link
-      title = e["activity:object"]["title"]
-      meta = { "url" => links["enclosure"] }
+      title = e.xpath('//activity:object/xmlns:title').first.content
+      meta = { "url" => e.xpath('//activity:object/xmlns:link[@rel=enclosure]').first['href'] }
     end
 
     # If we don't know what this post is, balls to it
@@ -229,7 +220,7 @@ post '/pubsub/?' do
       :user => user,
       :type => type,
       :title => title,
-      :content => e["activity:object"]["content"] || e["activity:object"]["summary"],
+      :content => e.xpath('//activity:object/xmlns:content').first.content || e.xpath('//activity:object/xmlns:summary').first.content,
       :meta => meta,
       :image => image
     )
