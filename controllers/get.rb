@@ -159,59 +159,9 @@ get '/user/:user/feed/?' do |user|
   # Atom feed
   @user = User.first( :name => user )
   halt 404 unless @user
-  atom = Proudhon::Atom.new
-  atom.id = "tag:#{ROOT};feed:#{@user.id}"
-  atom.title = @user.name
-  atom.generator = settings.site_title
-  atom.author = Proudhon::Author.new
-  atom.author.name = @user.name
-  atom.author.uri = "http://#{ROOT}/user/#{user}"
-  atom.author.links[:alternate] = "http://#{ROOT}/user/#{user}"
-  atom.links[:alternate] = "http://#{ROOT}/user/#{user}"
-  atom.links[:self] = "http://#{ROOT}/user/#{user}/feed"
-  atom.links[:hub] = "http://zeon.superfeedr.com/"
-  atom.links[:profile] = "http://#{ROOT}/user/#{user}"
-
-  atom.entries = Activity.all( :type => [:post, :image, :video, :link], :parent_id => nil, :user => @user, :order => :id.desc ).map do |a|
-    entry = Proudhon::Entry.new
-    entry.id = "tag:#{ROOT};activity:#{a.id.to_s}"
-    entry.title = a.title
-    entry.content = feed_content(a)
-    entry.updated = Time.parse(a.updated_at.to_s).strftime("%Y-%m-%dT%T%z")
-    entry.published = Time.parse(a.created_at.to_s).strftime("%Y-%m-%dT%T%z")
-    entry.verb = a.type
-    entry.objtype = a.type
-    entry.links[:alternate] = "http://#{ROOT}/thread/#{a.id.to_s}"
-    case a.type
-    when :image
-      entry.links[:preview] = a.image.url(:thumb_all)
-      entry.links[:enclosure] = a.image.url
-    end
-    #if [:image, :link, :video].include? a.type
-    #  webpage = Proudhon::Annotation.new
-      #webpage.type = "webpage"
-    #  webpage.attributes = Proudhon::Attributes.new
-    #  webpage.attributes.attributes << Proudhon::Attribute.new
-    #  webpage.attributes.attributes.first.name = "url"
-    #  webpage.attributes.attributes.first.value = a.meta.fetch("url", false) || a.meta.fetch("video_url", false) || a.meta.fetch("source_url", "")
-    #  entry.annotations << webpage
-    #end
-    #if not a.content.empty?
-    #  text = Proudhon::Annotation.new
-      #text.type = "text"
-    #  text.attributes = Proudhon::Attributes.new
-    #  text.attributes.attributes << Proudhon::Attribute.new
-    #  text.attributes.attributes.first.name = "raw"
-    #  text.attributes.attributes.first.value = a.content
-    #  entry.annotations << text
-    #end
-    entry
-  end
-
-  atom.updated = atom.entries.first.updated
-
+  @entries = Activity.all( :type => [:post, :image, :video, :link], :parent_id => nil, :user => @user, :order => :id.desc )
   content_type 'application/atom+xml'
-  atom.to_xml
+  haml :"user/feed", :layout => false
 end
 
 get '/webfinger/?' do

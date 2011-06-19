@@ -135,13 +135,13 @@ helpers do
   def feed_content(o)
     case o.type
     when :post
-      markdown(o.content)
+      markdownit(o.content)
     when :image
-      markdown("![](#{o.image.url(:medium)})\n\n#{o.content}")
+      markdownit("![](#{o.image.url(:medium)})\n\n#{o.content}")
     when :link
-      markdown("[#{o.title}](#{o.meta["url"]})\n\n#{o.content}")
+      markdownit("[#{o.title}](#{o.meta["url"]})\n\n#{o.content}")
     when :video
-      o.meta["video_html"] + markdown("\n[#{o.title}](#{o.meta["video_url"]})\n\n#{o.content}")
+      o.meta["video_html"] + markdownit("\n[#{o.title}](#{o.meta["video_url"]})\n\n#{o.content}")
     end
   end
 end

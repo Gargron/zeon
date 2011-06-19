@@ -37,7 +37,7 @@ post '/activity' do
         redirect '/create', :error => "That 'URL' you got there wasn't a valid URL!"
       end
       video_html = nil
-      if oembed = OEmbed.valid? (params[:url], "maxwidth" => "600", "maxheight" => "350")
+      if oembed = OEmbed.valid?(params[:url], "maxwidth" => "600", "maxheight" => "350")
         video_html = oembed.to_s
       else
         redirect '/create', :error => "Sorry, we currently support only Youtube, Vimeo, Hulu and Viddler"
@@ -172,14 +172,57 @@ post '/salmon/?' do
 end
 
 post '/pubsub/?' do
-  xml = CGI.unescape(request.env["rack.input"].read)
-  atom = Proudhon::Atom.parse xml
+  xml = CGI.unescape(request.body.read)
+  atom = Crack::XML.parse(xml)
 
-  atom.entries.each do |entry|
-    uri = URI.parse atom.author.uri
-    user = User.first( :name => atom.author.name, :domain => uri.host )
+  entries = atom["feed"]["entry"].kind_of?(Array) ? atom["feed"]["entry"] : [atom["feed"]["entry"]]
 
-    activity = Activity.create( :type => entry.objtype, :title => entry.title, :content => entry.content, :user => user )
+  entries.each do |e|
+    # Find existing remote user
+    uri = URI.parse e["author"]["uri"]
+    user = User.find( :name => e["author"]["name"], :domain => uri.host )
+
+    # Otherwise skip, no anons wanted
+    next unless user
+
+    raw_links = e["activity:object"]["link"].kind_of?(Array) ? e["activity:object"]["link"] : [e["activity:object"]["link"]]
+    links = {}
+
+    raw_links.each do |l|
+      links[l["rel"]] = l["href"]
+    end
+
+    # Determine post type, optional meta stuff
+    case e["activity:object"]["activity:object-type"]
+    when "http://activitystrea.ms/schema/1.0/article"
+      type = :post
+      title = e["activity:object"]["title"]
+      meta = {}
+    when "http://activitystrea.ms/schema/1.0/image"
+      type = :image
+      title = nil
+      meta = {}
+    when "http://activitystrea.ms/schema/1.0/video"
+      type = :video
+      title = e["activity:object"]["title"]
+      meta = {}
+    when "http://activitystrea.ms/schema/1.0/review"
+      type = :link
+      title = e["activity:object"]["title"]
+      meta = { "url" => links["enclosure"] }
+    end
+
+    # If we don't know what this post is, balls to it
+    next unless type
+
+    # Create respective post
+    Activity.create(
+      :user => user,
+      :type => type,
+      :title => title,
+      :content => e["activity:object"]["content"] || e["activity:object"]["summary"],
+      :meta => meta
+    )
   end
 
 end

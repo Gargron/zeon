@@ -11,6 +11,7 @@ require 'proudhon'
 require 'yaml'
 require 'fileutils'
 require 'uri'
+require 'crack'
 require 'json'
 
 require 'sinatra/jsonp'

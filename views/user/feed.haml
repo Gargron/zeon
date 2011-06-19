@@ -1,0 +1,47 @@
+!!! XML
+%feed{ :xmlns => "http://www.w3.org/2005/Atom", :"xmlns:activity" => "http://activitystrea.ms/spec/1.0/" }
+  %id= "tag:#{ROOT},#{Time.parse(@entries.first.created_at.to_s).strftime("%Y")}:feed:#{@user.id}"
+  %title= @user.name
+  %updated= Time.parse(@entries.first.created_at.to_s).strftime("%Y-%m-%dT%TZ")
+  %link{ :rel => "self", :href => "http://#{ROOT}/user/#{@user.name}/feed", :type => "application/atom+xml" }/
+  %link{ :rel => "alternate", :href => "http://#{ROOT}/user/#{@user.name}", :type => "text/html" }/
+  %link{ :rel => "hub", :href => "http://pubsubhubbub.appspot.com" }/
+
+  - @entries.each do |a|
+    %entry
+      %id= "tag:#{ROOT},#{Time.parse(a.created_at.to_s).strftime("%Y")}:activity:#{a.id}"
+      %published= Time.parse(a.created_at.to_s).strftime("%Y-%m-%dT%TZ")
+      %updated= Time.parse(a.updated_at.to_s).strftime("%Y-%m-%dT%TZ")
+      %author
+        %activity:object-type http://activitystrea.ms/schema/1.0/person
+        %id= "tag:#{ROOT},#{Time.parse(a.created_at.to_s).strftime("%Y")}:person:#{a.user.name}"
+        %name= a.user.name
+        %uri= "http://#{ROOT}/user/#{a.user.name}"
+        %link{ :rel => "alternate", :href => "http://#{ROOT}/user/#{a.user.name}", :type => "text/html" }/
+      %title= a.title || "#" + a.id.to_s
+      %link{ :rel => "alternate", :href => "http://#{ROOT}/thread/#{a.id}", :type => "text/html" }/
+      %activity:verb http://activitystrea.ms/schema/1.0/post
+      %activity:object
+        %id= "tag:#{ROOT},#{Time.parse(a.created_at.to_s).strftime("%Y")}:activity:#{a.id}"
+        %uri= "http://#{ROOT}/thread/#{a.id}"
+        %link{ :rel => "alternate", :href => "http://#{ROOT}/thread/#{a.id}", :type => "text/html" }/
+        %title= a.title || "#" + a.id.to_s
+        %published= Time.parse(a.created_at.to_s).strftime("%Y-%m-%dT%TZ")
+        %updated= Time.parse(a.updated_at.to_s).strftime("%Y-%m-%dT%TZ")
+        - case a.type
+          - when :post
+            %activity:object-type http://activitystrea.ms/schema/1.0/article
+            %content= a.content
+          - when :image
+            %activity:object-type http://activitystrea.ms/schema/1.0/image
+            - if source = a.meta.fetch("source_url", false)
+              %link{ :rel => "enclosure", :href => source, :type => "text/html" }/
+            %image= a.image.url(:medium)
+            %fullImage= a.image.url
+            - if a.content?
+              %summary= a.content
+          - when :link, :video
+            %activity:object-type http://activitystrea.ms/schema/1.0/review
+            %link{ :rel => "enclosure", :href => a.meta.fetch("url", false) || a.meta.fetch("video_url"), :type => "text/html" }/
+            %content= a.content
+      %content{ :type => "html" }&~ feed_content(a)
