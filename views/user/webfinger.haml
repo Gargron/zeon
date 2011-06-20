@@ -1,0 +1,8 @@
+!!! XML
+%XRD{ :xmlns => "http://docs.oasis-open.org/ns/xri/xrd-1.0" }
+  %Subject= "acct:#{@user.name}@#{ROOT}"
+  %Alias= "http://#{ROOT}/user/#{@user.name}"
+  %Link{ :rel => "http://microformats.org/profile/hcard", :href => "http://#{ROOT}/user/#{@user.name}" }/
+  %Link{ :rel => "http://schemas.google.com/g/2010#updates-from", :href => "http://#{ROOT}/user/#{@user.name}/feed" }/
+  %Link{ :rel => "magic-public-key", :href => @magic_key }/
+  %Link{ :rel => "gravatar", :href => @user.avatar }

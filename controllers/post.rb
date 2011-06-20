@@ -174,7 +174,9 @@ post '/pubsub/?' do
   xml = CGI::unescape(request.body.read)
 
   logger = Logger.new('logfile.log')
+  logger2 = Logger.new('postfile.log')
   logger.info("POST")
+  logger2.info("POST") { xml }
 
   atom = Nokogiri::XML::Document.parse xml
 

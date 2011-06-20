@@ -58,8 +58,7 @@
           %a{ :href => "/", :rel => "home" }
             %em#site_title
               %img#logo{ :src => "/images/cl_logo.png", :width => "70", :height => "70" }
-              The
-              %strong Colorless
+              = settings.site_title
       %article#main
         %div#container
           = yield
