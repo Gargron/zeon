@@ -242,6 +242,7 @@ post '/pubsub/?' do
       :title => entry[:title],
       :content => entry[:content],
       :image => image,
+      :status => :remote,
       :meta => meta,
       :created_at => Time.parse(entry[:published]),
       :updated_at => Time.parse(entry[:updated])

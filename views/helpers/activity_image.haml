@@ -9,7 +9,7 @@
     %dd
       = @that.image_dimensions
       = "(" + megapixels(@that.image_dimensions).to_s + "MP)"
-  - if (source = @that.meta.fetch("source_url", false))
+  - if (source = @that.meta.fetch("source_url", false)) and not source.empty?
     %dl
       %dt Source:
       %dd

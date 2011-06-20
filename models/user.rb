@@ -31,6 +31,8 @@ class User
   def avatar(size = 30)
     if not email.nil?
       "http://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(email)}?s=#{size}"
+    elsif hash = blob.fetch("gravatar_hash", false)
+      "http://www.gravatar.com/avatar/#{hash}?s=#{size}"
     else
       "http://www.gravatar.com/avatar/?s=#{size}"
     end
