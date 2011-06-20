@@ -10,11 +10,11 @@
           = @c.meta["like_count"]
           &bull;
           = haml :"helpers/like"
-      - if @c.meta.has_key? "source_url"
+      - if source = @c.meta.fetch("source_url", false) and not source.empty?
         %dl
           %dt Source:
           %dd
-            %a.tt{ :href => @c.meta["source_url"], :title => @c.meta["source_url"] }= ellipse_url(@c.meta["source_url"], 15)
+            %a.tt{ :href => source, :title => source }= ellipse_url(source, 15)
       %dl
         %dt Size:
         %dd= make_bytes(@c.image.size)
