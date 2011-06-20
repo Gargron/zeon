@@ -282,7 +282,8 @@ post '/follow' do
 
   if @cur_user.does_follow user
     user.blob = user.blob.merge( "remote_url" => feed, "email_hash" => gravatar_hash )
-    if user.save
+    user.save
+    if user.saved?
       flash.now[:notice] = "Feed URL and other user data updated, anyway"
     end
     redirect '/follow', :error => "Already following #{name}"
