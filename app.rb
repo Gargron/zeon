@@ -42,14 +42,14 @@ set :show_exceptions, true if config['env'] == 'development'
 set :reload_templates, true if config['env'] == 'development'
 set :session_secret, config['secret']
 set :chat, config['chat']
-set :logging, true
+#set :logging, true
 set :run, false
 
 use Rack::Flash, :sweep => true
 
-log = File.new("app.log", "a")
-STDOUT.reopen(log)
-STDERR.reopen(log)
+#log = File.new("app.log", "a")
+#STDOUT.reopen(log)
+#STDERR.reopen(log)
 
 Tilt.register 'markdown', Tilt::RedcarpetTemplate
 

@@ -8,6 +8,7 @@ class Activity
     :video, :question, :event, :like, :bookmark, :vote, :tag,
     :attendance, :invitation, :poke, :recommendation, :message,
     :announcement, :follow, :unfollow ], :required => true, :index => true
+  property :status, Enum[ :normal, :remote ], :default => :normal
   property :title, String, :length => 3..100
   property :content, Text
   property :meta, Json, :default => {}
@@ -37,6 +38,7 @@ class Activity
   validates_attachment_size :image, :in => 1..5242880
 
   validates_uniqueness_of :user_id, :scope => [:parent_id, :type], :if => lambda { |t| t.type == :like }
+  validates_uniqueness_of :user_id, :scope => [:parent_id, :created_at]
 
   ## Constants
   REQUIRES_TITLE = [ :post, :link, :video, :question, :event ]
@@ -56,7 +58,7 @@ class Activity
       self.meta = meta.merge( "post_count" => 1, "like_count" => 0, "bumped_id" => self.id, "bumped_by" => self.user.name, "bumped_at" => self.created_at )
     end
 
-    if self.image
+    if self.type == :image
       tempfile = self.image.queued_for_write[:original]
 
       unless tempfile.nil?

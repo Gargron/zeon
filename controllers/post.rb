@@ -180,6 +180,8 @@ post '/pubsub/?' do
 
   entries = atom.css("entry")
 
+  logger.info("Entries") { entries.length }
+
   entries.each do |re|
     e = re.children
     entry = {
@@ -212,6 +214,7 @@ post '/pubsub/?' do
       type = :post
     when "http://activitystrea.ms/schema/1.0/image"
       type = :image
+      entry[:title] = nil
       image = download_image(entry[:image])
       meta["source_url"] = entry[:link]
     when "http://activitystrea.ms/schema/1.0/video"
@@ -241,9 +244,10 @@ post '/pubsub/?' do
       :created_at => Time.parse(entry[:published]),
       :updated_at => Time.parse(entry[:updated])
     ) and post.saved?
+      logger.info("Created post") { post.type.to_s +  + " / " + post.title.to_s }
       next
     else
-      logger.error("Creating post") { post.errors }
+      logger.error("Creating post") { post.errors.to_a.join(" / ") }
     end
   end
 
@@ -322,8 +326,7 @@ post '/login' do
     session[:id], session[:name], session[:email] = user.id, user.name, user.email
     redirect '/', :notice => 'Login successful!'
   else
-    flash.now[:error] = "Wrong username/login combination"
-    haml :'user/login'
+    redirect '/login', :error => "Wrong username/login combination"
   end
 end
 
@@ -349,7 +352,10 @@ post '/reset' do
   end
 
   if user = User.first(:email => params[:email])
-    puts user.password = (rand(2**32) + 2**32).to_s(36)
+    #logger = Logger.new('logfile.log')
+    new_pass = (rand(2**32) + 2**32).to_s(36)
+    #logger.info("Password") { new_pass }
+    user.password = new_pass
     user.save
   end
 

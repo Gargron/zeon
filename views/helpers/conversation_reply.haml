@@ -7,9 +7,10 @@
     %a{ :href => "/thread/" + @item.id.to_s + "#p" + @c.id.to_s }= "#" + @c.id.to_s
   %span.time= ago(@c.created_at)
 %div.item_content
-  - if @c.type == :post
+  - if [:post, :link].include? @c.type
     %div.item_head
-      %h1= @c.title
+      - unless @c.type == :link
+        %h1= @c.title
       %ul
         %li
           = @c.meta["like_count"]

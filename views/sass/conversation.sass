@@ -64,13 +64,14 @@ ul.conversation
           line-height: 1em
           letter-spacing: -1px
           padding: 10px
-          margin-bottom: .2em
+          margin-bottom: 0
         ul
           overflow: hidden
           *zoom: 1
           border-top: 1px solid #0a0a0a
           color: #aaa
           font-size: 13px
+          margin-top: 1.2em
           background: rgba(20, 20, 20, 0.6)
           li
             float: left
@@ -151,7 +152,7 @@ ul.conversation
       background-color: #000
       &:hover
         background-color: #0a0a0a
-  li.item_video
+  li.item_video, li.item_link
     margin-bottom: 1.5em
     .item_head
       &>h1
@@ -169,6 +170,7 @@ ul.conversation
           text-decoration: none
           &:hover
             text-decoration: underline
+  li.item_video
     iframe, object
       display: block
       width: 600px
