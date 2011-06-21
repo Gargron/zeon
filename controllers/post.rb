@@ -198,6 +198,8 @@ post '/pubsub/?' do
       :objtype => e.at_xpath("//activity:object/activity:object-type").content
     }
 
+    tags = e.css("category").to_a.map { |c| c["term"] }
+
     # Find remote user
     uri = URI.parse entry[:uri]
     user = User.first( :name => entry[:name], :domain => uri.host )
@@ -247,6 +249,7 @@ post '/pubsub/?' do
       :created_at => Time.parse(entry[:published]),
       :updated_at => Time.parse(entry[:updated])
     ) and post.saved?
+      post.add_tags(tags)
       logger.info("Created post") { post.type.to_s +  + " / " + post.title.to_s }
       next
     else

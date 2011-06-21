@@ -169,6 +169,9 @@ class Activity
   end
 
   def add_tags(spaced_tags)
+    if spaced_tags.kind_of?(Array)
+      spaced_tags = spaced_tags.join(" ")
+    end
     unless spaced_tags.empty?
       spaced_tags = spaced_tags.scan(/[\w\s\!\(\)\&]/).join
       tags = spaced_tags.downcase.split(" ")
