@@ -261,18 +261,23 @@ post '/follow' do
 
   redirect '/follow', :error => "Empty ID!" unless not params[:user_id].nil?
 
-  finger = Proudhon::Finger.fetch params[:user_id]
+  ostatus = Zeon::OStatus.new
+  finger = ostatus.finger(params[:user_id])
 
   unless !finger.nil?
     raise "Couldn't finger the user's feed"
   end
 
-  feed = finger.links[:updates_from]
-  gravatar = URI.parse finger.links[:gravatar].to_s
+  logger = Logger.new('logfile.log')
+
+  feed = finger.at("Link[rel='http://schemas.google.com/g/2010#updates-from']")["href"]
+  gravatar = URI.parse finger.at("Link[rel=gravatar]")["href"]
   gravatar_hash = gravatar.path.gsub(/\/avatar\//, '')
-  subject = finger.subject.gsub(/acct:/, '').split('@')
+  subject = finger.at("Subject").content.gsub(/acct:/, '').split('@')
   name = subject[0]
   domain = subject[1]
+
+  logger.info("Gravatar hash") { gravatar_hash }
 
   user = User.first( :name => name, :domain => domain) || User.create( :status => :remote, :name => name, :domain => domain, :blob => { 'remote_url' => feed, 'email_hash' => gravatar_hash } )
 
@@ -283,10 +288,7 @@ post '/follow' do
   if @cur_user.does_follow user
     user.blob = user.blob.merge( "remote_url" => feed, "email_hash" => gravatar_hash )
     user.save
-    if user.saved?
-      flash.now[:notice] = "Feed URL and other user data updated, anyway"
-    end
-    redirect '/follow', :error => "Already following #{name}"
+    redirect '/follow', :error => "Already following #{name}", :notice => "Feed URL and other user data updated, anyway"
   end
 
   @cur_user.follows << user

@@ -7,6 +7,7 @@ gem "activesupport"
 gem "datamapper", ">= 1.1.0"
 gem "dm-mysql-adapter"
 gem "redis"
+gem "rest-client"
 gem "nokogiri"
 gem "proudhon", :git => 'git://github.com/Gargron/proudhon.git'
 gem "sinatra-jsonp"
@@ -20,4 +21,3 @@ gem "dm-paperclip"
 gem "oembed_links"
 gem "stalker"
 gem "redcarpet"
-gem 'redis-store', :git => 'git://github.com/Gargron/redis-store.git', :branch => 'patch-1'
