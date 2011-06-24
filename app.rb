@@ -5,7 +5,6 @@ require 'haml'
 require 'sass'
 require 'datamapper'
 require 'openssl'
-require 'redis'
 require 'proudhon'
 
 require 'yaml'
@@ -16,10 +15,7 @@ require 'rest_client'
 require 'nokogiri'
 require 'logger'
 require 'json'
-
-require 'sinatra/jsonp'
 require 'sinatra/session'
-require 'sinatra/flash'
 require 'rack-flash'
 require 'sinatra/redirect_with_flash'
 require 'will_paginate'
@@ -30,10 +26,10 @@ require 'stalker'
 require 'redcarpet'
 
 ## Config
-config = YAML.load_file('config.yml')
+config = YAML.load_file('config/config.yml')
 
 ## Config OEmbed
-OEmbed.register_yaml_file(Dir.pwd + "/config-oembed.yml")
+OEmbed.register_yaml_file(Dir.pwd + "/config/config-oembed.yml")
 
 ## Config Sinatra
 set :site_title, config['site_title']
@@ -41,7 +37,7 @@ set :environment, config['env']
 set :show_exceptions, true if config['env'] == 'development'
 set :reload_templates, true if config['env'] == 'development'
 set :session_secret, config['secret']
-set :chat, config['chat']
+set :views, Proc.new { File.join(root, "app/views") }
 #set :logging, true
 set :run, false
 
@@ -64,14 +60,13 @@ Paperclip.configure do |conf|
 end
 
 ## Helpers
-require 'helpers'
+require 'app/helpers'
 
 ## Constants
 ROOT = config['root']
-REDIS = Redis.new :host => 'localhost', :port => 6379
 
 ## Models
-require 'models'
+require 'app/models'
 
 DataMapper.finalize
 
@@ -90,4 +85,4 @@ before do
 end
 
 ## Controllers
-require 'controllers'
+require 'app/controllers'

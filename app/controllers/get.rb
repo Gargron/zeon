@@ -130,6 +130,16 @@ get %r{/thread/([\d]+)(/page/([\d]+))?} do |id, o, p|
   haml :thread
 end
 
+get '/thread/:thread/feed/?' do |thread|
+  # Atom feed
+  @thread = Activity.all( :conditions => ["id = ? or parent_id = ?", thread, thread], :order => :id.desc, :limit => 30 )
+  unless @thread
+    halt 404
+  end
+  @updated = Time.parse @thread.first.created_at.to_s
+  haml :"activity/feed"
+end
+
 get '/create' do
   session!
 
@@ -137,7 +147,7 @@ get '/create' do
 end
 
 get '/style/style.css' do
-  sass :"sass/style", :load_paths => [ File.dirname(__FILE__) + '/views' ]
+  sass :"sass/style", :load_paths => [ Dir.pwd + '/app/views' ]
 end
 
 get '/follow' do
@@ -159,7 +169,7 @@ get '/user/:user/feed/?' do |user|
   # Atom feed
   @user = User.first( :name => user )
   halt 404 unless @user
-  @entries = Activity.all( :type => [:post, :image, :video, :link], :parent_id => nil, :user => @user, :order => :id.desc )
+  @entries = Activity.all( :type => [:post, :image, :video, :link], :parent_id => nil, :user => @user, :order => :id.desc, :limit => 30 )
   @updated = @entries.first.nil? ? Time.now : Time.parse(@entries.first.created_at.to_s)
   content_type 'application/atom+xml'
   haml :"user/feed", :layout => false
@@ -186,11 +196,6 @@ get '/pubsub/?' do
   mode = params['hub.mode']
 
   params['hub.challenge']
-end
-
-get '/chat' do
-  halt 404 unless settings.chat
-  haml :chat
 end
 
 ## Access Control

@@ -43,9 +43,6 @@
                   %a{ :href => "/all/type:video" } Videos
                 %li
                   %a{ :href => "/all/type:link" } Links
-            - if settings.chat
-              %li
-                %a{ :href => "/chat" } Chat
             - if !session?
               %li
                 %a{ :href => "/login" } Sign in
